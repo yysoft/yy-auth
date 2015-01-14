@@ -1,0 +1,240 @@
+<link rel="stylesheet" type="text/css" href="#springUrl('/js/dhtmlxscheduler/dhtmlxscheduler.css')" />
+<link rel="stylesheet" type="text/css" href="#springUrl('/js/dhtmlxscheduler/ext/dhtmlxscheduler_ext.css')" />
+<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/dhtmlxscheduler.js')"></script>
+<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/ext/dhtmlxscheduler_tooltip.js')"></script>
+<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/ext/dhtmlxscheduler_readonly.js')"></script>
+##<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/ext/dhtmlxscheduler_timeline.js')"></script>
+##<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/ext/dhtmlxscheduler_treetimeline.js')"></script>
+<script type="text/javascript"src="#springUrl('/js/dhtmlxscheduler/locale/locale_cn.js')"></script>
+
+<style type="text/css">
+	.dhx_cal_event.color_my div {background-color:#8c66d9 !important; color:white !important;}
+	.dhx_cal_event.color_orth div {background-color:#668cd9 !important; color:white !important;}
+</style>
+
+<script type="text/javascript">
+Ext.onReady(function(){
+	
+	
+	/*
+	scheduler.templates.event_text=function(start,end,event){
+		var str="";
+		if(typeof event.staffName != "undefined"){
+			str=str+"<b>拥有者</b>："+event.staffName+"<br />";
+		}
+		if(typeof event.assignStaffName != "undefined"){
+			str=str+"<b>授予人</b>："+event.assignStaffName+"<br />";
+		}
+		return str+event.text;
+	}
+	*/
+	
+	scheduler.templates.tooltip_date_format=scheduler.date.date_to_str("%Y-%m-%d %H:%i"); 
+	//scheduler.locale.labels.timeline_tab = "甘特图";
+	//scheduler.locale.labels.section_custom="Section";
+	//scheduler.config.details_on_create=true;
+	scheduler.config.details_on_dblclick=true;
+	scheduler.config.xml_date="%Y-%m-%d %H:%i";
+	//scheduler.config.event_duration = 45;
+	scheduler.config.full_day = true;
+	scheduler.config.multi_day = true;
+	
+	/*
+	elements = [ // original hierarhical array to display
+    	#foreach($staff in $!{deptMember.keySet()})
+			#if($velocityCount!=1),#end
+    		{key:"$!{staff}",label:"$!{deptMember.get($!{staff})}"}
+    	#end
+	];
+		
+	scheduler.createTimelineView({
+		section_autoheight: false,
+		name:	"timeline",
+		x_unit:	"day",
+		x_date:	"%m-%d",
+		x_step:	1,
+		x_size: 30,
+		x_start: 1,
+		//x_length:	48,
+		y_unit: elements,
+		y_property:	"staff",
+		render: "tree",
+		folder_events_available: true,
+		dy:60
+	});
+	*/
+	
+	var url="#springUrl('/scheduler/event/queryEvent.htm')";
+	#if($!{type}=="staff")
+		url=url+"?ownerAccount=$!{user.account}";
+	#elseif($!{type}=="dept")
+		url=url+"?deptCode=$!{user.deptCode}";
+	#end
+	scheduler.init('scheduler_here',new Date(),"week");
+	scheduler.setLoadMode("week");
+	scheduler.load(url,"json");
+	
+	scheduler.config.lightbox.sections=[
+		{name:"description", height:200, map_to:"text", type:"textarea" , focus:true},
+		{name:"staff",height:30,map_to:"staff",type:"select",options:[
+			{key:"",label:"默认自己"}
+			#foreach($staff in $!{deptMember.keySet()})
+        		,{key:"$!{staff}",label:"$!{deptMember.get($!{staff})}"}
+			#end
+		]},
+		{name:"time", height:72, type:"time", map_to:"auto"}
+	];
+	
+	scheduler.attachEvent("onEventChanged",function(eid,eobj){
+		eventChanged(eobj);
+	});
+	
+	scheduler.attachEvent("onEventAdded",function(eid,eobj){
+		eventAdded(eid,eobj);
+	});
+	
+	scheduler.attachEvent("onBeforeEventDelete",function(eid,eobj){
+		//我创建或者属于我的，可以被我删除
+		var as=eobj.assignStaff;
+		var s=eobj.staff;
+		if(typeof as == "undefined"){
+			as="$!{user.account}";
+		}
+		if(typeof s == "undefined"){
+			s="$!{user.account}";
+		}
+		if(as!="$!{user.account}" && s!="$!{user.account}"){
+			alert("请不要随便删除别人的日程");
+			return false;
+		}
+		eventDeleted(eid);
+		return true;
+	});
+	
+	scheduler.templates.event_class=function(start,end,event){
+		if(typeof event.staff =="undefined" || event.staff=="" || event.staff=="$!{user.account}"){
+			return "color_my";
+		}else{
+			return "color_orth";
+		}
+	}
+	
+});
+
+function eventChanged(eobj){
+	Ext.Ajax.request({
+        url:Context.ROOT+"/scheduler/event/eventChanged.htm",
+        params:{
+            "id":eobj.id,
+			"text":eobj.text,
+			"details":eobj.details,
+			"ownerAccount":eobj.staff,
+			"start":Ext.util.Format.date(eobj.start_date, 'Y-m-d H:i:s'),
+			"end":Ext.util.Format.date(eobj.end_date, 'Y-m-d H:i:s')
+        },
+        success:function(response,opt){
+            var obj = Ext.decode(response.responseText);
+            if(obj.success){
+            	
+            }else{
+                Ext.MessageBox.show({
+                    title:MESSAGE.title,
+                    msg : MESSAGE.saveFailure,
+                    buttons:Ext.MessageBox.OK,
+                    icon:Ext.MessageBox.ERROR
+                });
+            }
+        },
+        failure:function(response,opt){
+            Ext.MessageBox.show({
+                title:MESSAGE.title,
+                msg : MESSAGE.submitFailure,
+                buttons:Ext.MessageBox.OK,
+                icon:Ext.MessageBox.ERROR
+            });
+        }
+    });
+}
+
+function eventAdded(eid,eobj){
+	Ext.Ajax.request({
+        url:Context.ROOT+"/scheduler/event/eventAdded.htm",
+        params:{
+			"text":eobj.text,
+			"details":eobj.details,
+			"ownerAccount":eobj.staff,
+			"start":Ext.util.Format.date(eobj.start_date, 'Y-m-d H:i:s'),
+			"end":Ext.util.Format.date(eobj.end_date, 'Y-m-d H:i:s')
+        },
+        success:function(response,opt){
+            var obj = Ext.decode(response.responseText);
+            if(obj.success){
+				scheduler.changeEventId(eid,obj.data)
+            }else{
+                Ext.MessageBox.show({
+                    title:MESSAGE.title,
+                    msg : MESSAGE.saveFailure,
+                    buttons:Ext.MessageBox.OK,
+                    icon:Ext.MessageBox.ERROR
+                });
+            }
+        },
+        failure:function(response,opt){
+            Ext.MessageBox.show({
+                title:MESSAGE.title,
+                msg : MESSAGE.submitFailure,
+                buttons:Ext.MessageBox.OK,
+                icon:Ext.MessageBox.ERROR
+            });
+        }
+    });
+}
+
+
+function eventDeleted(id){
+	Ext.Ajax.request({
+        url:Context.ROOT+"/scheduler/event/eventDeleted.htm",
+        params:{
+            "id":id
+        },
+        success:function(response,opt){
+            var obj = Ext.decode(response.responseText);
+            if(obj.success){
+            	
+            }else{
+                Ext.MessageBox.show({
+                    title:MESSAGE.title,
+                    msg : MESSAGE.saveFailure,
+                    buttons:Ext.MessageBox.OK,
+                    icon:Ext.MessageBox.ERROR
+                });
+            }
+        },
+        failure:function(response,opt){
+            Ext.MessageBox.show({
+                title:MESSAGE.title,
+                msg : MESSAGE.submitFailure,
+                buttons:Ext.MessageBox.OK,
+                icon:Ext.MessageBox.ERROR
+            });
+        }
+    });
+}
+
+</script>
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+	<div class="dhx_cal_navline">
+		<div class="dhx_cal_prev_button" >&nbsp;</div>
+		<div class="dhx_cal_next_button">&nbsp;</div>
+		<div class="dhx_cal_today_button"></div>
+		<div class="dhx_cal_date"></div>
+		##<div class="dhx_cal_tab" name="timeline_tab" style="right:280px;"></div>
+		<div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+		<div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+		<div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+	</div>
+	<div class="dhx_cal_header">
+	</div>
+	<div class="dhx_cal_data">
+	</div>
+</div>

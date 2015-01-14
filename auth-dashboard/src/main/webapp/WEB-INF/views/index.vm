@@ -1,0 +1,2 @@
+<script type="text/javascript" src="#springUrl('/app/index.js')" ></script>
+<input type="hidden" id="logineduser" value="$!{staffName}" />

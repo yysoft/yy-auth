@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="authRole">
+	<typeAlias alias="role" type="net.caiban.auth.dashboard.domain.auth.AuthRole" />
+	
+	<resultMap id="roleResult" class="role">
+		<result property="id" column="id" />
+		<result property="name" column="name"/>
+		<result property="remark" column="remark"/>
+		<result property="gmtCreated" column="gmt_created"/>
+		<result property="gmtModified" column="gmt_modified"/>
+	</resultMap>
+	
+	<select id="queryRightOfRole" parameterClass="java.lang.Integer" resultClass="java.lang.Integer" >
+		select right_id from auth_role_right where role_id=#value#
+	</select>
+	
+	<update id="updateRole" parameterClass="role" >
+		update auth_role
+		set 
+		name=#name#,
+		remark=#remark#,
+		gmt_modified=now()
+		where id=#id#
+	</update>
+	
+	<insert id="insertRole" parameterClass="role" >
+		insert into auth_role(`name`,`remark`,`gmt_created`,`gmt_modified`)
+		values(#name#,#remark#,now(),now())
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<select id="queryRole" resultMap="roleResult" >
+		select 
+			ar.id,
+			ar.name,
+			ar.remark,
+			ar.gmt_created,
+			ar.gmt_modified
+		from auth_role ar
+	</select>
+	
+	<delete id="deleteRightOfRole" parameterClass="java.lang.Integer" >
+		delete from auth_role_right
+		where role_id=#value#
+	</delete>
+	
+	<delete id="deleteRole" parameterClass="java.lang.Integer" >
+		delete from auth_role where id=#value#
+	</delete>
+	
+	<insert id="insertRoleRight" parameterClass="java.util.HashMap" >
+		insert into auth_role_right(role_id,right_id,gmt_created,gmt_modified)
+		values(#roleId#,#rightId#,now(),now())
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteRoleRight" parameterClass="java.util.HashMap" >
+		delete from auth_role_right
+		where role_id=#roleId# and right_id=#rightId#
+	</delete>
+</sqlMap>

@@ -1,0 +1,15 @@
+##<link rel="stylesheet" type="text/css" href ="http://img0.zz91.com/lib/extjs/3.2/resources/css/ext-all.css"/>
+##<link rel="stylesheet" type="text/css" href="http://img0.zz91.com/lib/extjs/themes/desktop-all.css" />
+##<link rel="stylesheet" type="text/css" href="http://img0.zz91.com/lib/extjs/themes/boomy.css" />
+##<script type="text/javascript" src="http://img0.zz91.com/lib/extjs/3.2/adapter/ext/ext-base.js"></script>
+##<script type="text/javascript" src="http://img0.zz91.com/lib/extjs/3.2/ext-all.js" ></script>
+##<script type="text/javascript" src="http://img0.zz91.com/lib/extjs/3.2/ext-lang-zh_CN.js"></script>
+
+<link rel="stylesheet" type="text/css" href ="#springUrl('/js/ext32/resources/css/ext-all.css')"/>
+<link rel="stylesheet" type="text/css" href="#springUrl('/themes/desktop-all.css')" />
+<link rel="stylesheet" type="text/css" href="#springUrl('/themes/boomy.css')" />
+<script type="text/javascript" src="#springUrl('/js/ext32/adapter/ext/ext-base.js')"></script>
+<script type="text/javascript" src="#springUrl('/js/ext32/ext-all.js')" ></script>
+<script type="text/javascript" src="#springUrl('/js/ext32/ext-lang-zh_CN.js')"></script>
+
+<link rel="Shortcut Icon" href="#springUrl('/favicon.ico')" />

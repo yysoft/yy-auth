@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="attendance" >
+    <typeAlias alias="attendance" type="net.caiban.auth.dashboard.domain.hr.Attendance" />
+    <resultMap id="fullcolumnResult" class="attendance" >
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="code" column="code" />
+        <result property="account" column="account" />
+        <result property="gmtWork" column="gmt_work" />
+        <result property="gmtCreated" column="gmt_created" />
+        <result property="gmtModeified" column="gmt_modified" />
+        <result property="scheduleId" column="schedule_id" />
+    </resultMap>
+	<sql id="fullcolumn" >
+		id,
+		name,
+		code,
+		account,
+		gmt_work,
+		gmt_created,
+		gmt_modified,
+		schedule_id
+    </sql>
+<!-- 
+
+
+
+   
+
+
+    <select
+        id="getAttendanceCount"
+        parameterClass="java.util.Date"
+        resultClass="java.lang.Integer" >
+	  select count(*) from  attendance att where gmt_work = #gmtWork#
+	  
+    </select>
+
+	
+    <select
+        id="getAttByDate"
+        parameterClass="java.util.HashMap"
+        resultMap="fullcolumnResult" >
+		select 
+		<include refid="fullcolumn"/>
+		from attendance where gmt_work >= #from# and #to#>=gmt_work
+    </select>
+ -->
+    
+    <!-- ************************** -->
+    
+	<sql id="dynamicQuery" >
+		<dynamic prepend="where" >
+			<isNotEmpty prepend="and" property="name" >
+				name=#name#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="code" >
+				code=#code#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="from" >
+				gmt_work >= #from#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="to" >
+				 #to# >=gmt_work
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="scheduleId" >
+				 schedule_id=#scheduleId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="queryAttendanceCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer" >
+	    select count(*) from attendance
+	    <include refid="dynamicQuery"/>
+	</select>
+
+    <select id="queryAttendance" parameterClass="java.util.HashMap" resultMap="fullcolumnResult" >
+	   	select 
+        <include refid="fullcolumn" />
+	     from attendance 
+        <include refid="dynamicQuery" />
+        <include refid="common.pageOrderBy" />
+        <include refid="common.pageLimit" />
+    </select>
+    
+    <select id="queryAttendancesByWork" parameterClass="java.util.HashMap" resultMap="fullcolumnResult">
+		select 
+        <include refid="fullcolumn" />
+	     from attendance 
+        <include refid="dynamicQuery" />
+        order by gmt_work asc
+    </select>
+    
+    <insert id="insert" parameterClass="attendance" >
+		insert into attendance (
+	   	name,
+	   	code,
+	   	account,
+	   	gmt_work,
+	   	gmt_created,
+	   	gmt_modified,
+	   	schedule_id
+	   	)
+	   	values
+	   	(
+	   	#name#,
+	   	#code#,
+	   	#account#,
+	   	#gmtWork#,
+	   	now(),
+	   	now(),
+	   	#scheduleId#
+		)
+
+		<selectKey keyProperty="id" resultClass="java.lang.Integer" >
+			select last_insert_id()
+		</selectKey>
+    </insert>
+
+    <delete id="deleteAttendance" parameterClass="java.util.HashMap" >
+		delete from attendance where gmt_work >= #from# 
+		and #to# >=gmt_work and schedule_id=#scheduleId#
+    </delete>
+
+</sqlMap>

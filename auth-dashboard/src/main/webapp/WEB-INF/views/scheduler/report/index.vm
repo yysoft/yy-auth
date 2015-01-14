@@ -1,0 +1,29 @@
+<script type="text/javascript"src="#springUrl('/app/scheduler/report.js')"></script>
+
+<script type="text/javascript">
+Ext.onReady(function(){
+	 new Ext.Viewport({
+		layout:"border",
+		items:[
+		     {
+			    region:"west",
+				title:"日程表", 
+				width:500,
+				maxSize:600,
+				minSize:400,
+				split:true,
+				collapsible:true,
+				layout:"fit",
+				items:[new com.zz91.zzwork.scheduler.report.ContentForm]
+			 },
+			 {
+			    region:"center", 
+				layout:"fit",
+				title:"详细信息",
+				items:[new com.zz91.zzwork.scheduler.report.SchedulerGrid],
+			 }
+		 ]
+		})
+});
+</script>
+

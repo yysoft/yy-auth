@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="attendanceAnalysis" >
+	
+	<typeAlias alias="attendanceAnalysis" type="net.caiban.auth.dashboard.domain.hr.AttendanceAnalysis" />
+	
+	 <resultMap class="attendanceAnalysis" id="fullcolumnResult">
+	    <result property="id" column="id"/>
+	    <result property="code" column="code"/>
+	    <result property="name" column="name"/>
+	    <result property="account" column="account"/>
+	    <result property="dayFull" column="day_full"/>
+	    <result property="dayActual" column="day_actual"/>
+	    <result property="dayLeave" column="day_leave"/>
+	    <result property="dayOther" column="day_other"/>
+	    <result property="dayUnwork" column="day_unwork"/>
+	    <result property="dayUnrecord" column="day_unrecord"/>
+	    <result property="dayLate" column="day_late"/>
+	    <result property="dayEarly" column="day_early"/>
+	    <result property="dayOvertime" column="day_overtime"/>
+	    <result property="gmtTarget" column="gmt_target"/>
+	    <result property="scheduleId" column="schedule_id"/>
+	</resultMap>
+
+	<sql id="fullcolumn">
+	    `id`,
+		`code`,
+		`name`,
+		`account`,
+		`day_full`,
+		`day_actual`,
+		`day_leave`,
+		`day_other`,
+		`day_unwork`,
+		`day_unrecord`,
+		`day_late`,
+		`day_early`,
+		`day_overtime`,
+		`gmt_target`,
+		`schedule_id`
+	</sql>
+	
+	<insert id="insert" parameterClass="attendanceAnalysis" >
+		INSERT INTO `attendance_analysis`
+		(
+		`code`,
+		`name`,
+		`account`,
+		`day_full`,
+		`day_actual`,
+		`day_leave`,
+		`day_other`,
+		`day_unwork`,
+		`day_unrecord`,
+		`day_late`,
+		`day_early`,
+		`day_overtime`,
+		`gmt_target`,
+		`gmt_created`,
+		`gmt_modified`,
+		`schedule_id`)
+		VALUES
+		(
+		#code#,
+		#name#,
+		#account#,
+		#dayFull#,
+		#dayActual#,
+		#dayLeave#,
+		#dayOther#,
+		#dayUnwork#,
+		#dayUnrecord#,
+		#dayLate#,
+		#dayEarly#,
+		#dayOvertime#,
+		#gmtTarget#,
+		now(),
+		now(),
+		#scheduleId#
+		)
+
+		<selectKey keyProperty="id" resultClass="java.lang.Integer" >
+			select last_insert_id()
+		</selectKey>
+    </insert>
+    
+	<delete id="deleteByGmtTarget" parameterClass="java.util.HashMap">
+	    delete from attendance_analysis
+	    where gmt_target=#gmtTarget# and schedule_id=#scheduleId#
+	</delete>
+	
+	<sql id="dynamicQuery">
+		<dynamic prepend="where" >
+			<isNotEmpty prepend="and" property="name" >
+				name=#name#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="code" >
+				code=#code#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="gmtTarget" >
+				gmt_target = #gmtTarget#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="queryAnalysis" parameterClass="java.util.HashMap" resultMap="fullcolumnResult">
+	    select
+	    	<include refid="fullcolumn"/>
+	    from attendance_analysis
+	    	<include refid="dynamicQuery" />
+	    	<include refid="common.pageOrderBy" />
+			<include refid="common.pageLimit" />
+	</select>
+	
+	<select id="queryAnalysisCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		select count(*) from attendance_analysis
+		<include refid="dynamicQuery" />
+	</select>
+	
+	<update id="updateAnalysis" parameterClass="attendanceAnalysis">
+	  UPDATE `attendance_analysis`
+		SET
+		`day_full` = #dayFull#,
+		`day_actual` = #dayActual#,
+		`day_leave` = #dayLeave#,
+		`day_other` = #dayOther#,
+		`day_unwork` = #dayUnwork#,
+		`day_unrecord` = #dayUnrecord#,
+		`day_late` = #dayLate#,
+		`day_early` = #dayEarly#,
+		`day_overtime` = #dayOvertime#,
+		`gmt_modified` = now()
+		WHERE id=#id#
+	</update>
+	
+	<select id="queryAnalysisByMonth" parameterClass="java.util.Date" resultMap="fullcolumnResult">
+	     select
+	    	<include refid="fullcolumn"/>
+	    from attendance_analysis
+    	where gmt_target = #value#
+	</select>
+</sqlMap>

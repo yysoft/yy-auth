@@ -1,0 +1,74 @@
+<script type="text/javascript" src="#springUrl('/app/auth/right.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/auth/rightTree.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		var tree=new com.zz91.zzwork.auth.right.Tree({
+			id:RIGHT.TREE,
+			layout:"fit",
+			region:"center",
+			contextmenu:new Ext.menu.Menu({
+        		items:[{
+        			text:"添加权限",
+        			cls:"add16",
+        			handler:function(menu){
+						com.zz91.zzwork.auth.right.AddFormWin();
+        			}
+        		},{
+					text:"修改权限",
+					cls:"edit16",
+					handler:function(menu){
+						com.zz91.zzwork.auth.right.EditFormWin();
+					}
+				},{
+					text:"删除权限",
+					cls:"delete16",
+					handler:function(menu){
+						var tree=Ext.getCmp(RIGHT.TREE);
+						var node = tree.getSelectionModel().getSelectedNode();
+						if(tree.getRootNode() == node){
+							return ;
+						}
+						
+						Ext.MessageBox.confirm(MESSAGE.title,MESSAGE.confirmDelete, function(btn){
+							if(btn != "yes"){
+								return false;
+							}
+							Ext.Ajax.request({
+                                url:Context.ROOT+"/auth/right/deleteRight.htm",
+                                params:{"code":node.attributes.data},
+                                success:function(response,opt){
+                                    var obj = Ext.decode(response.responseText);
+                                    if(obj.success){
+                                        node.remove();
+                                    }else{
+                                        Ext.MessageBox.show({
+                                            title:MESSAGE.title,
+                                            msg : MESSAGE.saveFailure,
+                                            buttons:Ext.MessageBox.OK,
+                                            icon:Ext.MessageBox.ERROR
+                                        });
+                                    }
+                                },
+                                failure:function(response,opt){
+                                    Ext.MessageBox.show({
+                                        title:MESSAGE.title,
+                                        msg : MESSAGE.submitFailure,
+                                        buttons:Ext.MessageBox.OK,
+                                        icon:Ext.MessageBox.ERROR
+                                    });
+                                }
+                        });
+						});
+					}
+				}]
+    		})
+		});
+		
+		tree.getRootNode().expand();
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[tree]
+		})
+	})
+</script>

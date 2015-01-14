@@ -1,0 +1,34 @@
+{
+	grid1:[
+	      	{id:"1",title:"第五周24日日报",name:"员工甲"},
+			{id:"2",title:"第五周25日日报",name:"员工甲"},
+			{id:"3",title:"第五周26日日报",name:"员工甲"},
+			{id:"4",title:"第五周27日日报",name:"员工甲"},
+	        {id:"5",title:"第五周28日日报",name:"员工甲"},
+	        {id:"6",title:"第五周29日日报",name:"员工甲"},
+	        {id:"7",title:"第五周30日日报",name:"员工甲"}
+	 ],
+	 grid2:[
+            {id:"1",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"2",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"3",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"4",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"5",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"6",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"7",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"8",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"9",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"10",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"11",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"12",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"13",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"14",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"15",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"16",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"17",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"18",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"19",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+            {id:"20",schedule:"完成设计完成设计",performance:"60%",importance:"重要"},
+    
+    ]  
+}

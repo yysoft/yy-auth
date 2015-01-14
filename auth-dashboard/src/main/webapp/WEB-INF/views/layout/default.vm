@@ -1,0 +1,15 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>员工工作平台 V1.2.x</title>
+#parse("/common/import.vm")
+#parse("/common/context.vm")
+<script type="text/javascript" src="#springUrl('/app/login.js')"></script>
+</head>
+
+<body>
+$screen_content
+</body>
+</html>

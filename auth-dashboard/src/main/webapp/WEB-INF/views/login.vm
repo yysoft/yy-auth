@@ -1,0 +1,11 @@
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		com.zz91.zzwork.UserLoginWin(function(){
+			#if("$!{gourl}"!="")
+			window.location.href="$!{gourl}";
+			#else
+			window.location.href=Context.ROOT+"/index.htm";
+			#end
+		});
+	});
+</script>

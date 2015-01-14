@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="authUser">
+	<typeAlias alias="authRight" type="net.caiban.auth.dashboard.domain.auth.AuthRight" />
+	<typeAlias alias="authRole" type="net.caiban.auth.dashboard.domain.auth.AuthRole" />
+	
+	<resultMap class="authRight" id="rightResult">
+		<result property="id" column="id" />
+		<result property="code" column="code" />
+		<result property="sort" column="sort" />
+		<result property="content" column="content" />
+		<result property="menu" column="menu" />
+		<result property="menuUrl" column="menu_url" />
+		<result property="menuCss" column="menu_css" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<resultMap  class="authRole" id="simpleRoleResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+	</resultMap>
+	
+	
+	<select id="countUser" parameterClass="java.util.HashMap" resultClass="java.lang.Integer" >
+		select count(*) from auth_user where username=#account#
+		<dynamic>
+			<isNotEmpty prepend="and" property="password">
+				password=#password#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryRightOfUser" parameterClass="java.util.HashMap" resultMap="rightResult">
+		select
+		ar.`id`,
+		ar.`code`,
+		ar.`name`,
+		ar.`sort`,
+		ar.`content`,
+		ar.`menu`,
+		ar.`menu_url`,
+		ar.`menu_css`,
+		ar.`gmt_created`,
+		ar.`gmt_modified`
+		from auth_role_right arr
+		inner join auth_right ar on ar.id=arr.right_id 
+		inner join auth_user_role aur on arr.role_id=aur.role_id
+		inner join auth_user au on aur.user_id=au.id
+		where au.username=#account# and ar.code like concat(#parentCode#,'%')
+	</select>
+	
+	<select id="queryChildRightOfUser" parameterClass="java.util.HashMap" resultMap="rightResult">
+		select
+		ar.`id`,
+		ar.`code`,
+		ar.`name`,
+		ar.`sort`,
+		ar.`content`,
+		ar.`menu`,
+		ar.`menu_url`,
+		ar.`menu_css`,
+		ar.`gmt_created`,
+		ar.`gmt_modified`
+		from auth_role_right arr
+		inner join auth_right ar on ar.id=arr.right_id 
+		inner join auth_user_role aur on arr.role_id=aur.role_id
+		inner join auth_user au on aur.user_id=au.id
+		where au.username=#account# and ar.code like concat(#parentCode#,'____')
+	</select>
+	
+	<insert id="insertUser" parameterClass="java.util.HashMap" >
+		insert into `auth_user`
+		(
+		`username`,
+		`password`,
+		`email`,
+		`steping`,
+		`gmt_created`,
+		`gmt_modified`)
+		values
+		(
+		#account#,
+		#password#,
+		#email#,
+		#steping#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+		select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<update id="updatePassword" parameterClass="java.util.HashMap" >
+		update auth_user set
+			password=#password#,
+			gmt_modified=now()
+		where username=#account#
+	</update>
+	
+	<select id="queryUserIdByAccount" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select id from auth_user
+		where username=#value#
+		limit 1
+	</select>
+	
+	<insert id="insertUserRole" parameterClass="java.util.HashMap" >
+		insert into auth_user_role(role_id,user_id,gmt_created,gmt_modified)
+		values(#roleId#,#userId#,now(),now())
+	</insert>
+	
+	<delete id="deleteUserRole" parameterClass="java.lang.Integer" >
+		delete from auth_user_role where user_id=#value#
+	</delete>
+	
+	<update id="updateSteping" parameterClass="java.util.HashMap" >
+		update auth_user set
+		steping=#steping#,
+		gmt_modified=now()
+		where id=#userId#
+	</update>
+	
+	<select id="queryRoleOfUser" parameterClass="java.lang.String" resultMap="simpleRoleResult" >
+		select r.id,r.name from auth_user_role aur
+		inner join auth_role r on aur.role_id=r.id
+		inner join auth_user u on aur.user_id=u.id
+		where u.username = #value#
+	</select>
+	
+</sqlMap>

@@ -1,0 +1,17 @@
+#set( $layout = "/layout/api.vm" )
+<input type="hidden" id="name" value="$!{user.name}" />
+<input type="hidden" id="staffNo" value="$!{user.staffNo}" />
+<input type="hidden" id="account" value="$!{user.account}" />
+<input type="hidden" id="deptCode" value="$!{user.deptCode}"/>
+<input type="hidden" id="vticket" value="$!{user.vticket}"/>
+<input type="hidden" id="key" value="$!{user.key}"/>
+
+#set($right="")
+#foreach($r in $!{user.rightArr})
+	#if($velocityCount==1)
+		#set($right=$r)
+	#else
+		#set($right=$right+"|"+$r)
+	#end
+#end
+<input type="hidden" id="rightArr" value="$!{right}"/>

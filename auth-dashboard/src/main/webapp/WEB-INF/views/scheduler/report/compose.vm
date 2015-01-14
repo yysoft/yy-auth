@@ -1,0 +1,126 @@
+<script type="text/javascript"src="#springUrl('/app/scheduler/report.js')"></script>
+
+<script type="text/javascript">
+Ext.onReady(function(){
+	var form=new com.zz91.zzwork.scheduler.report.Form;
+	var schedulerGrid=new com.zz91.zzwork.scheduler.report.SchedulerGrid({
+		id:REPORT.REPORT_GRID
+	});
+	var toolbar=new Ext.Toolbar({
+		items:[{
+			xtype:"button",
+			text:"删除",
+			iconCls : 'delete16',
+			handler:function(){
+				var row=Ext.getCmp(REPORT.REPORT_GRID).getSelectionModel().getSelections();
+					if(row.length>0){
+					Ext.MessageBox.confirm(Context.MSG_TITLE,'是否要删除选择的'+row.length+'记录数?',function(_btn){
+						if(_btn!="yes")
+							return;
+						for(var i=0;i<row.length;i++){
+							Ext.Ajax.request({
+								url:Context.ROOT +  "/scheduler/event/eventDeleted.htm",
+								params:{"id":row[i].get("id")},
+								success:function(response,opt){
+									var obj = Ext.decode(response.responseText);
+									if(obj.success){
+										alert("删除成功");
+										Ext.getCmp(REPORT.REPORT_GRID).getStore().reload();
+										}else{
+											Ext.MessageBox.show({
+												title:MESSAGE.title,
+												msg : MESSAGE.saveFailure,
+												buttons:Ext.MessageBox.OK,
+												icon:Ext.MessageBox.ERROR
+											});
+										}
+									},
+								failure:function(response,opt){
+									Ext.MessageBox.show({
+										title:MESSAGE.title,
+										msg : MESSAGE.submitFailure,
+										buttons:Ext.MessageBox.OK,
+										icon:Ext.MessageBox.ERROR
+									});
+								}
+							})
+						}
+					});
+				}
+			}
+		},"->",{
+				xtype:"checkbox",
+					boxLabel:"日报",
+					inputValue:1,
+					handler:function(btn){
+						var B=schedulerGrid.store.baseParams||{};
+						if(btn.getValue()){
+							B["day"]="1";
+						}else{
+							B["day"]=undefined;
+						}
+						schedulerGrid.store.baseParams = B;
+						schedulerGrid.store.reload({params:{"start":0,"limit":Context.PAGE_SIZE}});
+					}
+		},"-",{
+				xtype:"checkbox",
+					boxLabel:"周报",
+					inputValue:1,
+					handler:function(btn){
+						var B=schedulerGrid.store.baseParams||{};
+						if(btn.getValue()){
+							B["week"]="1";
+						}else{
+							B["week"]=undefined;
+						}
+						schedulerGrid.store.baseParams = B;
+						schedulerGrid.store.reload({params:{"start":0,"limit":Context.PAGE_SIZE}});
+					}
+				}	
+			]
+		});
+	schedulerGrid.add(toolbar);
+	new Ext.Viewport({
+		layout:"border",
+		items:[{
+			title:"汇报",
+    		region:"west",
+    		split:true,
+			collapsible:true,
+    		width:500,
+    		maxSize:600,
+    		minSize:400,
+			layout:"fit",
+			items:[form]
+		},{
+			region:"center",
+		    title:"日程信息",
+			layout:"fit",
+			items:[schedulerGrid]
+		}]
+	})
+
+	
+	
+	/*var reportForm= new com.zz91.zzwork.scheduler.report.Form({
+		title:"汇报",
+		region:"west",
+		split:true,
+		width:500,
+		maxSize:500,
+		minSize:300
+	});
+	
+	var schedulerGrid=new com.zz91.zzwork.scheduler.report.SchedulerGrid({
+		region:"center",
+		title:"日程信息"
+	});
+
+	new Ext.Viewport({
+		layout:"border",
+		items:[reportForm,schedulerGrid]
+	})*/
+		
+});
+</script>
+

@@ -1,0 +1,141 @@
+<style >
+.maindiv {margin-top:10px;padding:0px 10px 10px 10px;}
+
+table td {
+	padding:5px;
+	text-align:right;
+}
+
+table th {
+	padding:5px;
+	text-align:center;
+}
+</style>
+
+<script type="text/javascript" >
+	
+	function addSchedule(){
+		var name=Ext.query("#scheduleName")[0].value;
+		if(name=="" || name==null){
+			Ext.MessageBox.show({
+                title:MESSAGE.title,
+                msg : "请填写班次名称",
+                buttons:Ext.MessageBox.OK,
+                icon:Ext.MessageBox.ERROR
+            });
+			return ;
+		}
+		
+		Ext.Ajax.request({
+			url:Context.ROOT+"/hr/attendanceschedule/create.htm",
+			params:{"name":name},
+			success:function(response,opt){
+				window.location.reload();
+	        },
+	        failure:function(response,opt){
+	            Ext.MessageBox.show({
+	                title:MESSAGE.title,
+	                msg : MESSAGE.submitFailure,
+	                buttons:Ext.MessageBox.OK,
+	                icon:Ext.MessageBox.ERROR
+	            });
+	        }
+		});
+		
+	}
+	
+	function update(id){
+		var name=Ext.query("#updateName"+id)[0].value;
+		if(name=="" || name==null){
+			Ext.MessageBox.show({
+                title:MESSAGE.title,
+                msg : "班次名称不能为空",
+                buttons:Ext.MessageBox.OK,
+                icon:Ext.MessageBox.ERROR
+            });
+			return ;
+		}
+		
+		Ext.Ajax.request({
+			url:Context.ROOT+"/hr/attendanceschedule/update.htm",
+			params:{"name":name,"id":id},
+			success:function(response,opt){
+				window.location.reload();
+	        },
+	        failure:function(response,opt){
+	            Ext.MessageBox.show({
+	                title:MESSAGE.title,
+	                msg : MESSAGE.submitFailure,
+	                buttons:Ext.MessageBox.OK,
+	                icon:Ext.MessageBox.ERROR
+	            });
+	        }
+		});
+		
+	}
+	
+	function updateStatus(id, status){
+		Ext.Ajax.request({
+			url:Context.ROOT+"/hr/attendanceschedule/updateStatus.htm",
+			params:{"isuse":status,"id":id},
+			success:function(response,opt){
+				window.location.reload();
+	        },
+	        failure:function(response,opt){
+	            Ext.MessageBox.show({
+	                title:MESSAGE.title,
+	                msg : MESSAGE.submitFailure,
+	                buttons:Ext.MessageBox.OK,
+	                icon:Ext.MessageBox.ERROR
+	            });
+	        }
+		});
+	}
+	
+</script>
+
+<div class="maindiv" >
+	#set($preyear=$!{year} - 1)
+	#set($nextyear=$!{year} + 1)
+	时间： <a href="#springUrl('/hr/attendanceschedule/index.htm?year=')$!{preyear}" >上一年</a> $!{year} 年 <a href="#springUrl('/hr/attendanceschedule/index.htm?year=')$!{nextyear}" >下一年</a>
+</div>
+
+<div class="maindiv" >
+	增加班次： <input type="text" id="scheduleName" value="" /> 
+	<input type="button" value="增加" onclick="addSchedule()"/>
+</div>
+
+<div class="maindiv" >
+    <table border="1" cellpadding="0" cellspacing="0">
+		<tr>
+			<th>班次</th>
+			#foreach($month in [1..12])
+			<th>$!{month}月</th>
+			#end
+			<th>操作</th>
+		</tr>
+		#foreach($schedule in $!{list})
+        <tr>
+			<td>
+				<input type="input" id="updateName$!{schedule.schedule.id}" value="$!{schedule.schedule.name}" />
+				<input type="button" value="更新" onclick="update($!{schedule.schedule.id})" />
+			</td>
+    		#foreach($month in [0..11])
+    			<td>
+    				#if($!schedule.monthCount.get($!{month}) > 0)
+					<a href="#springUrl('/hr/attendancescheduledetail/show.htm?scheduleId=')$!{schedule.schedule.id}&year=$!{year}&month=$!{month}&action=update" target="_blank" >
+    					已排
+					</a>
+    				#else
+					<a href="#springUrl('/hr/attendancescheduledetail/show.htm?scheduleId=')$!{schedule.schedule.id}&year=$!{year}&month=$!{month}&action=add" target="_blank" >
+						未排
+					</a>
+    				#end
+				</td>
+			#end
+			<td><input type="button" value="禁用" onclick="updateStatus('$!{schedule.schedule.id}', 0)" /></td>
+		</tr>
+		#end
+	</table>
+</div>
+	

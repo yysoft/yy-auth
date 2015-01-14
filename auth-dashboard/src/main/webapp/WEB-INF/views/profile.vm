@@ -1,0 +1,16 @@
+<h3>这是您的个人信息</h3>
+
+姓名：$!{profile.staff.name} <br />
+工号：$!{profile.staff.staffNo} <br />
+账户：$!{profile.staff.account} <br />
+邮箱：$!{profile.staff.email} <br />
+职位：$!{profile.staff.jobs} <br />
+部门：$!{profile.deptName} <br />
+状态：
+	#if($!{profile.staff.status}==0)
+		<span style="color:green" >试用期</span>
+	#elseif($!{profile.staff.status}==1)
+		<span style="color:blue" >正式员工</span>
+	#elseif($!{profile.staff.status}==2)
+		<span style="color:red" >离职</span>
+	#end

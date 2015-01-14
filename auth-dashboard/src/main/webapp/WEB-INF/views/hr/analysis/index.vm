@@ -1,0 +1,23 @@
+<link rel="stylesheet" type="text/css" href="http://img0.zz91.com/lib/extjs/3.2/examples/ux/css/RowEditor.css" />
+<script type="text/javascript" src="http://img0.zz91.com/lib/extjs/3.2/examples/ux/RowEditor.js"></script>
+<script type="text/javascript" src="#springUrl('/app/hr/attendanceAnalysis.js')"></script>
+<script type="text/javascript" >
+
+	Ext.onReady(function(){
+	
+		#if("$!{schedule}"!="")
+			SCHEDULE=$!{schedule};
+		#end
+	
+		var grid = new com.zz91.zzwork.hr.attendance.analysis.MainGrid({
+			region:"center"
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[grid]
+		});
+	});
+
+	
+</script>

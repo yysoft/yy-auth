@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+		<sqlMap namespace="contacts">
+			<typeAlias alias="contactsDO" type="net.caiban.auth.dashboard.domain.Contacts" />
+			
+			<resultMap id="contactsResult" class="contactsDO">
+				<result property="id" column="id"/>
+				<result property="keys" column="keys"/>
+				<result property="values" column="values"/>
+				<result property="staffId" column="staff_id"/>
+				<result property="gmtCreated" column="gmt_created"/>
+				<result property="gmtModified" column="gmt_modified"/>
+			</resultMap>
+			
+		</sqlMap>

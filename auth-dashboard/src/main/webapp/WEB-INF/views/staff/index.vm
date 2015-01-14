@@ -1,0 +1,27 @@
+<script type="text/javascript" src="#springUrl('/app/dept/deptTree.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/staff/staff.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+	
+		var dept=new com.zz91.zzwork.dept.Tree({
+			region:"west",
+			split:true,
+			width:250
+		});
+		
+		var grid = new com.zz91.zzwork.staff.Grid({
+			region:"center"
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[dept, grid]
+		});
+		
+		dept.on("click",function(node,e){
+			node.select();
+			grid.getStore().baseParams["deptCode"]=node.attributes["data"];
+			grid.getStore().reload();
+		});
+	})
+</script>

@@ -1,0 +1,66 @@
+<script type="text/javascript" src="#springUrl('/app/bs/bs.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/dept/deptTree.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/auth/rightTree.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		var grid=new com.zz91.zzwork.bs.Grid({
+			id:BS.BS_GRID,
+			layout:"fit",
+			region:"center",
+		});
+		
+		var user=new com.zz91.zzwork.bs.StaffGrid({
+			id:BS.BS_USER_GRID,
+			region:"center",
+			layout:"fit"
+		});
+		
+		var dept=new com.zz91.zzwork.dept.Tree({
+			nodeUrl:Context.ROOT+"/bs/deptChild.htm",
+			region:"south",
+			layout:"fit",
+			height:300
+		});
+		
+		dept.getRootNode().expand();
+		
+		dept.getLoader().on("beforeload",function(treeLoader,node){
+			this.baseParams["parentCode"]=node.attributes["data"];
+			var r=grid.getSelectionModel().getSelected();
+			if(typeof(r)!="undefined"){
+				this.baseParams["bsId"]=r.get("id");
+			}
+		});
+		
+		dept.on("checkchange",function(node, checked){
+			var r=grid.getSelectionModel().getSelected();
+			if(typeof(r)!="undefined"){
+    			com.zz91.zzwork.bs.UpdateBsDept(r.get("id"), node.attributes["id"], checked);
+			}
+		});
+		
+		grid.on("rowclick",function(grid,rowIndex,e){
+			dept.getLoader().load(dept.getRootNode());
+			if(!dept.getRootNode().isExpanded()){
+    			dept.getRootNode().expand();
+			}
+			var r=grid.getSelectionModel().getSelected();
+			if(typeof(r)!="undefined"){
+				user.loadStaff(r.get("id"));
+			}
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[grid,{
+				split:true,
+				layout:"border",
+				region:"east",
+				width:350,
+				items:[user, dept]
+			}]
+		});
+	})
+</script>
+<input type="hidden" id="initCode" value="$!{initcode}"/>
+<input type="hidden" id="initPassword" value="$!{initpassword}"/>

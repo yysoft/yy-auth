@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="staff">
+
+	<typeAlias alias="staff" type="net.caiban.auth.dashboard.domain.staff.Staff" />
+	<typeAlias alias="staffDto" type="net.caiban.auth.dashboard.dto.staff.StaffDto" />
+	<typeAlias alias="bs" type="net.caiban.auth.dashboard.domain.bs.Bs"/>
+	
+	<resultMap class="bs" id="bsResult">
+		<result property="id" column="id"/>
+		<result property="code" column="code"/>
+		<result property="password" column="password"/>
+		<result property="name" column="name"/>
+		<result property="rightCode" column="right_code"/>
+		<result property="url" column="url"/>
+		<result property="avatar" column="avatar"/>
+		<result property="note" column="note"/>
+		<result property="types" column="types"/>
+		<result property="versions" column="versions"/>
+		<result property="gmtCreated" column="gmt_created"/>
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<resultMap class="staffDto" id="staffDtoResult">
+		<result property="staff" resultMap="staff.staffResult" />
+		<result property="deptName" column="deptName" />
+	</resultMap>
+	
+	<resultMap class="staff" id="staffResult">
+		<result property="id" column="id" />
+		<result property="account" column="account"/>
+		<result property="staffNo" column="staff_no"/>
+		<result property="deptCode" column="dept_code"/>
+		<result property="name" column="name" />
+		<result property="email" column="email"/>
+		<result property="sex" column="sex" />
+		<result property="avatar" column="avatar" />
+		<result property="birthday" column="birthday" />
+		<result property="jobs" column="jobs" />
+		<result property="status" column="status" />
+		<result property="gmtEntry" column="gmt_entry" />
+		<result property="gmtLeft" column="gmt_left" />
+		<result property="note" column="note" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<resultMap class="staff" id="staffNameResult">
+		<result property="account" column="account"/>
+		<result property="name" column="name" />
+		<result property="deptCode" column="dept_code" />
+	</resultMap>
+	
+	<sql id="fullcolumnBs">
+			b.id,
+			b.code,
+			b.password,
+			b.name,
+			b.right_code,
+			b.url,
+			b.avatar,
+			b.note,
+			b.types,
+			b.versions,
+			b.gmt_created,
+			b.gmt_modified
+	</sql>
+	
+	<sql id="fullColumn">
+			sf.id,
+			sf.account,
+			sf.staff_no,
+			sf.dept_code,
+			sf.name,
+			sf.email,
+			sf.sex,
+			sf.avatar,
+			sf.birthday,
+			sf.jobs,
+			sf.status,
+			sf.gmt_entry,
+			sf.gmt_left,
+			sf.note,
+			sf.gmt_created,
+			sf.gmt_modified
+	</sql>
+	
+	<insert id="insertStaff" parameterClass="staff">
+			insert into staff(
+			account,
+			staff_no,
+			dept_code,
+			name,
+			email,
+			sex,
+			avatar,
+			birthday,
+			jobs,
+			status,
+			gmt_entry,
+			gmt_left,
+			note,
+			gmt_created,
+			gmt_modified)
+			values
+			(
+			#account#,
+			#staffNo#,
+			#deptCode#,
+			#name#,
+			#email#,
+			#sex#,
+			#avatar#,
+			#birthday#,
+			#jobs#,
+			#status#,
+			#gmtEntry#,
+			#gmtLeft#,
+			#note#,
+			now(),
+			now()
+			)
+			<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+			</selectKey>
+	</insert>
+	<select id="countStaffByStatus" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+	 		select count(*) from staff
+	 		where account=#account#
+	 		<isNotEmpty property="status"  prepend="and">
+				<iterate property="status" open="(" close=")" conjunction="OR">
+					status =#status[]#
+				</iterate>
+			</isNotEmpty>
+	</select>
+	
+	<select id="queryStaffByAccount" parameterClass="java.lang.String" resultMap="staffResult">
+			select
+			<include refid="staff.fullColumn"/>
+			from staff sf 
+			where sf.account=#account#
+	</select>
+	
+	<sql id="dynmicStaff" >
+			where #staff.status# >= sf.status
+			<dynamic>
+				<isNotEmpty property="staff.name" prepend="and">
+					sf.name like concat('%',#staff.name#,'%')
+				</isNotEmpty>
+				<isNotEmpty property="staff.deptCode" prepend="and">
+					sf.dept_code = #staff.deptCode#
+				</isNotEmpty>
+				<isNotEmpty property="staff.staffNo" prepend="and">
+					sf.staff_no = #staff.staffNo#
+				</isNotEmpty>
+			</dynamic>
+	</sql>
+	
+	<select id="queryStaff" parameterClass="java.util.HashMap" resultMap="staffDtoResult" >
+			select 
+			<include refid="staff.fullColumn"/>
+			,d.name as deptName
+			from staff sf
+			inner join dept d on sf.dept_code=d.code
+			<include refid="staff.dynmicStaff"/>
+			<include refid="common.pageOrderBy" />
+			<include refid="common.pageLimit" />
+	</select>
+	
+	<select id="queryStaffCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+			select count(*) 
+			from staff sf
+			inner join dept d on sf.dept_code=d.code
+			<include refid="staff.dynmicStaff"/>
+	</select>
+	
+	<update id="updateStaffStatus" parameterClass="java.util.HashMap">
+			update staff
+			set
+			note = #note#,
+			status=#status#,
+			gmt_left=#gmtLeft#,
+			gmt_modified=now()
+			where id=#id# 
+	</update>
+
+	<select id="queryStaffIdByAccount" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+			select id from staff where account = #value#
+	</select>
+	
+	<select id="queryDeptCodeByStaffId" parameterClass="java.lang.Integer" resultClass="java.lang.String">
+			select dept_code from staff where id=#value#
+	</select>
+	
+	<update id="updateStaff" parameterClass="staff" >
+			 update `staff`
+			 set
+			`dept_code` = #deptCode#,
+			`name` = #name#,
+			`email` = #email#,
+			`sex` = #sex#,
+			`avatar` = #avatar#,
+			`birthday` = #birthday#,
+			`jobs` = #jobs#,
+			`gmt_entry` = #gmtEntry#,
+			`note` = #note#,
+			`gmt_modified` = now()
+			 where id=#id#
+	</update>
+	
+	<select id="queryBsByStaffId" parameterClass="java.lang.Integer" resultMap="bsResult">
+			select 
+			<include refid="staff.fullcolumnBs"/> 
+			from bs b 
+			inner join bs_staff bsstaff on b.id=bsstaff.bs_id
+			where bsstaff.staff_id=#value#
+	</select>
+	
+	<select id="queryDeptBsByStaffId" parameterClass="java.lang.String" resultMap="bsResult">
+			select 
+            <include refid="staff.fullcolumnBs"/>
+			from bs b
+			inner join bs_dept bd on b.id=bd.bs_id
+			inner join dept d on d.id=bd.dept_id
+			where d.code=#value#
+	</select>
+	
+	<select id="countStaff" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select count(*) from staff where staff_no=#value#
+	</select>
+	
+	<select id="queryNameByAccount" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select name from staff where account=#value#
+	</select>
+	
+	<select id="queryStaffNameByDeptCode" parameterClass="java.lang.String" resultMap="staffNameResult" >
+		select account, name, dept_code from staff 
+		where
+		2 > status and
+		dept_code like concat(#value#,'%')
+	</select>
+	
+	<select id="queryAccountByName" parameterClass="java.lang.String" resultClass="java.lang.String">
+	    select account from staff where name=#value# limit 1
+	</select>
+	
+</sqlMap>

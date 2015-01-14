@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+	default-autowire="byName">
+	<context:annotation-config />
+	<context:component-scan base-package="net.caiban.auth.dashboard" />
+
+	<!-- ibatis config -->
+	<bean id="propertyConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>${jdbc.location}</value>
+				<value>classpath:/web.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!--配置一个数据源,根据上面propertyConfig指定的location去找数据库连接的配置信息-->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${jdbc.driver}</value>
+		</property>
+		<property name="url">
+			<value>${jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.password}</value>
+		</property>
+	</bean>
+	<!--根据dataSource和configLocation创建一个SqlMapClient-->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlmap-config.xml</value>
+		</property>
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+	
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="i18n_desktop" />
+	</bean>
+	
+	<!-- CoC for controller classes -->
+	<bean
+		class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping">
+		<property name="caseSensitive"  value="false" />
+		<property name="basePackage"    value="net.caiban.auth.dashboard.controller" />
+		<property name="defaultHandler" value="rootController" />
+	</bean>
+
+	<!--  shared velocity engine which will be used by email and page presentation -->
+	<bean id="velocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="${velocity.resourceLoaderPath}"         />
+		<property name="preferFileSystemAccess" value="${velocity.preferFileSystemAccess}" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">${input.encoding}</prop>
+				<prop key="output.encoding">${output.encoding}</prop>
+				<prop key="file.resource.loader.cache">false</prop>
+				<prop key="file.resource.loader.modificationCheckInterval">2</prop>
+				<prop key="velocimacro.library">macro.vm</prop>
+				<!-- 针对开发而非实际应用的 -->
+				<prop key="velocimacro.library.autoreload">true</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="velocityConfig"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="velocityEngine" ref="velocityEngine" />
+	</bean>
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="suffix" value="${velocity.suffix}" />
+		<property name="layoutUrl" value="layout/default.vm" />
+		<property name="contentType" value="text/html;charset=utf-8" />
+		<property name="toolboxConfigLocation" value="WEB-INF/vm-toolbox.xml" />
+	</bean>
+	
+	<bean id="initSystem" class="net.caiban.auth.dashboard.init.InitSystem" init-method="startup" destroy-method="shutdown">
+	</bean>
+	
+	<!-- 初始化方法待改进 -->
+	<bean id="authConst" class="net.caiban.auth.sdk.AuthConst" init-method="startup">
+		<property name="projectCode" value="${work.project.code}"></property>
+		<property name="projectPassword" value="${work.project.password}"></property>
+		<property name="api" value="${work.api}" />
+		<property name="domain" value="${work.domain}" />
+	</bean>
+	
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="104857600" />
+		<property name="maxInMemorySize" value="4096" />
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="net.caiban.auth.dashboard.util.CommonBindingInitializer" />
+		</property>
+	</bean>
+	
+</beans>

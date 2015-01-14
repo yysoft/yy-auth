@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="feedback">
+
+	<typeAlias alias="feedback" type="net.caiban.auth.dashboard.domain.staff.Feedback" />
+	
+	<sql id="fullColumn">
+		id,
+		bs_id,
+		account,
+		topic,
+		content,
+		status,
+		gmt_created,
+		gmt_modified
+	</sql>
+	
+	<resultMap class="feedback" id="feedbackResult">
+		<result property="id" column="id"/>
+		<result property="bsId" column="bs_id"/>
+		<result property="account" column="account"/>
+		<result property="topic" column="topic"/>
+		<result property="content" column="content"/>
+		<result property="status" column="status"/>
+		<result property="gmtCreated" column="gmt_created"/>
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+
+	<insert id="insertFeedback" parameterClass="feedback">
+		insert into feedback(
+		bs_id,
+		account,
+		topic,
+		content,
+		status,
+		gmt_created,
+		gmt_modified)
+		values
+		(
+		#bsId#,
+		#account#,
+		#topic#,
+		#content#,
+		#status#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+		select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteFeedback" parameterClass="java.lang.Integer">
+		delete from feedback where id=#id#
+	</delete>	
+	
+	<update id="updateStatus" parameterClass="java.util.HashMap" >
+		update feedback set 
+		status=#status#,
+		gmt_modified=now() 
+		where id=#id#
+	</update>	
+	
+	<sql id="dynmicFeedback" >
+		<dynamic prepend="where">
+			<isNotEmpty property="status">
+				status=#status#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="queryFeedbackCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		select count(*) from feedback 
+		<include refid="feedback.dynmicFeedback" />
+	</select>
+	
+	<select id="queryFeedback" resultMap="feedbackResult" parameterClass="java.util.HashMap">
+		select 
+		<include refid="feedback.fullColumn" />
+		from feedback
+		<include refid="feedback.dynmicFeedback" />
+		<include refid="common.pageOrderBy" />
+		<include refid="common.pageLimit" />
+	</select>
+</sqlMap>

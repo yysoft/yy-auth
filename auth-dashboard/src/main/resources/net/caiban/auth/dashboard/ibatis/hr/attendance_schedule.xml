@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="attendanceSchedule" >
+	<typeAlias alias="schedule" type="net.caiban.auth.dashboard.domain.hr.AttendanceSchedule" />
+	
+	<resultMap class="schedule" id="defaultResult">
+		<result property="id" columnIndex="1"/>
+		<result property="name" columnIndex="2"/>
+		<result property="isuse" columnIndex="3"/>
+		<result property="createdBy" columnIndex="4"/>
+		<result property="modifiedBy" columnIndex="5"/>
+	</resultMap>
+	
+	<sql id="defaultColumn">
+		ats.id,ats.name,ats.isuse,ats.created_by,ats.modified_by
+	</sql>
+	
+	<select id="queryDefault" parameterClass="java.lang.Integer" resultMap="defaultResult">
+		select 
+			<include refid="attendanceSchedule.defaultColumn"/>
+		from attendance_schedule ats
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="value">
+				ats.isuse=#isuse#
+			</isNotEmpty>
+		</dynamic>
+		limit 500
+	</select>
+	
+	<insert id="insert" parameterClass="schedule">
+		insert into attendance_schedule(`name`,`created_by`,`modified_by`,`gmt_created`,`gmt_modified`)
+		values (#name#,#createdBy#,#modifiedBy#,now(),now())
+		
+		<selectKey keyProperty="id" resultClass="java.lang.Integer" >
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterClass="schedule">
+		update attendance_schedule set
+			name=#name#,
+			modified_by=#modifiedBy#,
+			gmt_modified=now()
+		where id=#id#
+	</update>
+	
+	<update id="updateStatus" parameterClass="java.util.HashMap">
+		update attendance_schedule set
+			isuse=#isuse#,
+			gmt_modified=now()
+		where id=#id#
+	</update>
+	
+	<select id="queryName" parameterClass="java.lang.Integer" resultClass="java.lang.String" >
+		select name from attendance_schedule where id=#id# limit 1
+	</select>
+</sqlMap> 

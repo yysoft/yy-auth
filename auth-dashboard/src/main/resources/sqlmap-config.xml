@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings useStatementNamespaces="true" />
+
+	<!-- common -->
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/common.xml"/>
+	
+	<!-- auth -->
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/auth/param.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/auth/auth_user.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/auth/auth_right.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/auth/auth_role.xml" />
+	
+	<!-- staff and bs -->
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/staff.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/bs.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/dept.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/feedback.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/scheduler_event.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/scheduler_report.xml" />
+	
+	<!-- hr -->
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/hr/attendance.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/hr/attendance_analysis.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/hr/attendance_schedule.xml" />
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/hr/attendance_schedule_detail.xml" />
+	<!-- 
+	<sqlMap resource="net/caiban/auth/dashboard/ibatis/hr/attendanceCount.xml" />
+	 -->
+</sqlMapConfig>

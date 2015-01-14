@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<toolbox>
+  <xhtml>true</xhtml>
+  
+  <!--
+  Modify By Rolyer 2009.12.28
+  
+	在前台页面中需要显示时间的地方添加这样的代码：
+	例如：要显示的时间为：$!user.time
+	那么添加的代码为：
+	$!date.format('yyyy-MM-dd HH:mm:ss ',$!user.time)
+	其中'yyyy-MM-dd HH:mm:ss '格式可以自己定义。
+  -->
+<tool>
+   <key>date</key>
+   <scope>application</scope>
+   <class>org.apache.velocity.tools.generic.DateTool</class>
+</tool>
+
+<tool>
+  <key>cookie</key>
+  <scope>request</scope>
+  <class>org.apache.velocity.tools.view.tools.CookieTool</class>
+</tool>
+  
+  <!--
+  <tool>
+     <key>control</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.control.ControlTool</class>
+   </tool>
+   <tool>
+     <key>appServer</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="appServer"/>
+   </tool>
+   <tool>
+     <key>imgServer</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="imgServer"/>
+   </tool>
+   <tool>
+     <key>upServer</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="upServer"/>
+   </tool>
+   <tool>
+     <key>gisServer</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="gisServer"/>
+   </tool>
+   <tool>
+     <key>adminMoudle</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="adminMoudle"/>
+   </tool>
+   <tool>
+     <key>homeMoudle</key>
+     <scope>request</scope>
+     <class>com.nonfamous.commom.util.web.URLToolForSpring</class>
+     <parameter name="configBeanName" value="homeMoudle"/>
+   </tool>
+   <tool>
+     <key>stringUtils</key>
+     <scope>application</scope>
+     <class>com.nonfamous.commom.util.StringUtils</class>
+   </tool>
+   <tool>
+     <key>numberUtils</key>
+     <scope>application</scope>
+     <class>com.nonfamous.commom.util.NumberUtils</class>
+   </tool>
+   <tool>
+     <key>dateUtils</key>
+     <scope>application</scope>
+     <class>com.nonfamous.commom.util.DateUtils</class>
+   </tool>
+   <tool>
+     <key>priceUtils</key>
+     <scope>application</scope>
+     <class>com.nonfamous.commom.util.PriceUtils</class>
+   </tool>
+   <tool>
+     <key>htmlUtils</key>
+     <scope>application</scope>
+     <class>com.nonfamous.commom.util.HtmlUtils</class>
+   </tool>
+   <tool>
+  		<key>esc</key>
+  		<scope>application</scope>
+  		<class>org.apache.velocity.tools.generic.EscapeTool</class>
+   </tool>-->
+</toolbox>

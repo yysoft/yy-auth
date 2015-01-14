@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>server</display-name>
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>webApp.root</param-value>
+	</context-param>
+
+	<!-- 权限过滤器 -->
+
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- authorize filter -->
+	<filter>
+		<filter-name>authorizeFilter</filter-name>
+		<filter-class>net.caiban.auth.sdk.AuthorizeFilter</filter-class>
+		<init-param>
+			<param-name>deniedURL</param-name>
+			<param-value>/forbiden.htm</param-value>
+		</init-param>
+		<init-param>
+			<param-name>loginURL</param-name>
+			<param-value>/login.htm</param-value>
+		</init-param>
+		<init-param>
+			<param-name>noAuthPage</param-name>
+			<param-value>/|/index.htm|/welcome.htm|/profile.htm|/mymenu.htm|/mybs.htm|/changePassword.htm|/feedback.htm|/todo/*</param-value>
+		</init-param>
+		<init-param>
+			<param-name>noLoginPage</param-name>
+			<param-value>/login.htm|/logout.htm|/forbiden.htm|/error.htm|/checkuser.htm|/api/*</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>authorizeFilter</filter-name>
+		<url-pattern>*.htm</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>desktopfilter</filter-name>
+		<filter-class>net.caiban.auth.dashboard.filter.DesktopFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>desktopfilter</filter-name>
+		<url-pattern>*.htm</url-pattern>
+	</filter-mapping>
+
+
+	<!-- startup -->
+	<servlet>
+		<servlet-name>SpringMVC</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:/spring-desktop.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>SpringMVC</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SpringMVC</servlet-name>
+		<url-pattern>/index.htm</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	
+</web-app>

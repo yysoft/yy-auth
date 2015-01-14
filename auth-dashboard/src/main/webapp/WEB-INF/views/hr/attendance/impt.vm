@@ -1,0 +1,46 @@
+<style >
+div {margin-top:10px;}
+</style>
+
+
+<div style="padding:20px;">
+	#if("error"==1)
+		<div style="colr:red" >日期填写不正确</div>
+	#end
+	#if("error"==2)
+		<div style="colr:red" >考勤班次必需选择</div>
+	#end
+<form action="#springUrl('/hr/attendance/doImpt.htm')" enctype="multipart/form-data" method="post">
+
+<div >
+    开始时间：<input name="from" id="from" value="$!{from}" ></input>
+	结束时间：<input name="to" id="to" value="$!{to}" ></input>
+	<div style="color:red;">格式： 2012-01-01</div>
+</div>
+
+<div>
+	考勤日期格式：
+	<input type="radio" name="dateFormat" value="yyyy-MM-dd HH:mm" checked />2012-01-01 01:01
+	<input type="radio" name="dateFormat" value="yyyy-MM-dd HH:mm:ss" />2012-01-01 01:01:01
+	
+</div>
+
+<div >
+	考勤班次：
+	<select name="scheduleId" >
+		#foreach($!{sc} in $!{schedule})
+			<option  value="$!{sc.id}">$!{sc.name}</option>
+		#end
+	</select>
+</div>
+
+<div>
+	考勤数据：<input type="file" name="uploadfile" />
+</div>
+
+<div>
+<input type="submit" value="确认所填信息无误，并提交" style="width:200px;height:24px;" />
+</div>
+</form>
+</div>
+	

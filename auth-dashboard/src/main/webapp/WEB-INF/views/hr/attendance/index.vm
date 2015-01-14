@@ -1,0 +1,39 @@
+<script type="text/javascript" src="#springUrl('/app/hr/attendance.js')"></script>
+<script type="text/javascript" >
+
+	Ext.onReady(function(){
+	
+		#if("$!{schedule}"!="")
+		SCHEDULE=$!{schedule};
+		#end
+		
+		var al=true;
+		#if("$!{code}"!="" || "${from}"!="")
+		al=false;
+		#end
+	
+		var grid = new com.zz91.zzwork.hr.attendance.MainGrid({
+			region:"center",
+			al:al
+		});
+		
+		#if("$!{code}"!="" || "${from}"!="")
+		grid.getStore().baseParams["code"] = "$!{code}";
+		grid.getStore().baseParams["from"]="$!{from}";
+		grid.getStore().baseParams["to"]="$!{to}";
+		grid.getStore().reload({params:{"start":0, "limit":Context.PAGE_SIZE}});
+		
+		Ext.getCmp("from").setValue("$!{from}");
+		Ext.getCmp("to").setValue("$!{to}");
+		Ext.getCmp("code").setValue("$!{code}");
+		
+		#end
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[grid]
+		});
+	});
+
+	
+</script>

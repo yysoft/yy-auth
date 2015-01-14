@@ -1,0 +1,693 @@
+#**
+ * spring.vm
+ *
+ * This file consists of a collection of Velocity macros aimed at easing
+ * some of the common requirements of web applications - in particular
+ * handling of forms.
+ *
+ * Spring's Velocity support will automatically make this file and therefore
+ * all macros within it available to any application using Spring's
+ * VelocityConfigurer.
+ *
+ * To take advantage of these macros, the "exposeSpringMacroHelpers" property
+ * of the VelocityView class needs to be set to "true". This will expose a
+ * RequestContext under the name "springMacroRequestContext", as needed by
+ * the macros in this library.
+ *
+ * @author Darren Davison
+ * @author Juergen Hoeller
+ * @since 1.1
+ *#
+#**
+ * springMessage
+ *
+ * Macro to translate a message code into a message.
+ *#
+#macro( springMessage $code )
+	$springMacroRequestContext.getMessage($code)
+#end
+
+#**
+ * springMessageText
+ *
+ * Macro to translate a message code into a message,
+ * using the given default text if no message found.
+ *#
+#macro( springMessageText $code $text )
+	$springMacroRequestContext.getMessage($code, $text)
+#end
+
+#**
+ * springTheme
+ *
+ * Macro to translate a theme message code into a string.
+ *#
+#macro( springTheme $code )
+	$springMacroRequestContext.getThemeMessage($code)
+#end
+
+#**
+ * springThemeText
+ *
+ * Macro to translate a theme message code into a string,
+ * using the given default text if no message found.
+ *#
+#macro( springThemeText $code $text )
+	$springMacroRequestContext.getThemeMessage($code, $text)
+#end
+
+#**
+ * springUrl
+ *
+ * Takes a relative URL and makes it absolute from the server root by
+ * adding the context root for the web application.
+ *#
+#macro( springUrl $relativeUrl )$springMacroRequestContext.getContextPath()${relativeUrl}#end
+
+#**
+ * springBind
+ *
+ * Exposes a BindStatus object for the given bind path, which can be
+ * a bean (e.g. "person") to get global errors, or a bean property
+ * (e.g. "person.name") to get field errors. Can be called multiple times
+ * within a form to bind to multiple command objects and/or field names.
+ *
+ * This macro will participate in the default HTML escape setting for the given
+ * RequestContext. This can be customized by calling "setDefaultHtmlEscape"
+ * on the "springMacroRequestContext" context variable, or via the
+ * "defaultHtmlEscape" context-param in web.xml (same as for the JSP bind tag).
+ * Also regards a "springHtmlEscape" variable in the template context.
+ *
+ * Producing no output, the following context variable will be available
+ * each time this macro is referenced:
+ *
+ *   $status : a BindStatus instance holding the command object name,
+ *   expression, value, and error codes and messages for the path supplied
+ *
+ * @param $path : the path (string value) of the value required to bind to.
+ *   Spring defaults to a command name of "command" but this can be overridden
+ *   by user config.
+ *#
+#macro( springBind $path )
+    #if("$!springHtmlEscape" != "")
+        #set( $status = $springMacroRequestContext.getBindStatus($path, $springHtmlEscape) )
+    #else
+        #set( $status = $springMacroRequestContext.getBindStatus($path) )
+    #end
+#end
+
+#**
+ * springBindEscaped
+ *
+ * Similar to springBind, but takes an explicit HTML escape flag rather
+ * than relying on the default HTML escape setting.
+ *#
+#macro( springBindEscaped $path $htmlEscape )
+    #set( $status = $springMacroRequestContext.getBindStatus($path, $htmlEscape) )
+#end
+
+#**
+ * springFormInput
+ *
+ * Display a form input field of type 'text' and bind it to an attribute
+ * of a command or bean.
+ *
+ * @param path the name of the field to bind to
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+ *
+ *#
+#macro( springFormInput $path $attributes )
+    #springBind($path)
+    <input type="text" id="${status.expression}" name="${status.expression}" value="$!status.value" ${attributes}#springCloseTag()
+#end
+
+#**
+ * springFormPasswordInput
+ *
+ * Display a form input field of type 'password' and bind it to an attribute
+ * of a command or bean.  No value will ever be specified for this field regardless
+ * of whether one exists or not.  For hopefully obvious reasons!
+ *
+ * @param path the name of the field to bind to
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+ *
+ *#
+#macro( springFormPasswordInput $path $attributes )
+    #springBind($path)
+    <input type="password" id="${status.expression}" name="${status.expression}" value="" ${attributes}#springCloseTag()
+#end
+
+#**
+ * springFormHiddenInput
+ *
+ * Generate a form input field of type 'hidden' and bind it to an attribute
+ * of a command or bean.
+ *
+ * @param path the name of the field to bind to
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+ *
+ *#
+#macro( springFormHiddenInput $path $attributes )
+    #springBind($path)
+    <input type="hidden" id="${status.expression}" name="${status.expression}" value="$!status.value" ${attributes}#springCloseTag()
+#end
+
+#**
+ * formTextArea
+ *
+ * display a text area and bind it to an attribute
+ * of a command or bean
+ *
+ * @param path the name of the field to bind to
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+ *
+ *#
+#macro( springFormTextarea $path $attributes )
+    #springBind($path)
+    <textarea id="${status.expression}" name="${status.expression}" ${attributes}>$!status.value</textarea>
+#end
+
+#**
+ * springFormSingleSelect
+ *
+ * Show a selectbox (dropdown) input element allowing a single value to be chosen
+ * from a list of options.
+ *
+ * The null check for $status.value leverages Velocity's 'quiet' notation rather
+ * than the more common #if($status.value) since this method evaluates to the
+ * boolean 'false' if the content of $status.value is the String "false" - not
+ * what we want.
+ *
+ * @param path the name of the field to bind to
+ * @param options a map (value=label) of all the available options
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+*#
+#macro( springFormSingleSelect $path $options $attributes )
+    #springBind($path)
+    <select id="${status.expression}" name="${status.expression}" ${attributes}>
+        #foreach($option in $options.keySet())
+            <option value="${option}"
+            #if("$!status.value" == "$option")
+                selected="selected"
+            #end>
+            ${options.get($option)}</option>
+        #end
+    </select>
+#end
+
+#**
+ * springFormMultiSelect
+ *
+ * Show a listbox of options allowing the user to make 0 or more choices from
+ * the list of options.
+ *
+ * @param path the name of the field to bind to
+ * @param options a map (value=label) of all the available options
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+*#
+#macro( springFormMultiSelect $path $options $attributes )
+    #springBind($path)
+    <select multiple="multiple" id="${status.expression}" name="${status.expression}" ${attributes}>
+        #foreach($option in $options.keySet())
+            <option value="${option}"
+            #foreach($item in $status.value)
+                #if($item == $option)
+                    selected="selected"
+                #end
+            #end
+            >${options.get($option)}</option>
+        #end
+    </select>
+#end
+
+#**
+ * springFormRadioButtons
+ *
+ * Show radio buttons.
+ *
+ * @param path the name of the field to bind to
+ * @param options a map (value=label) of all the available options
+ * @param separator the html tag or other character list that should be used to
+ *    separate each option.  Typically '&nbsp;' or '<br>'
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+*#
+#macro( springFormRadioButtons $path $options $separator $attributes )
+    #springBind($path)
+    #foreach($option in $options.keySet())
+        <input type="radio" name="${status.expression}" value="${option}"
+        #if("$!status.value" == "$option")
+            checked="checked"
+        #end
+        ${attributes}
+        #springCloseTag()
+        ${options.get($option)} ${separator}
+    #end
+#end
+
+#**
+ * springFormCheckboxes
+ *
+ * Show checkboxes.
+ *
+ * @param path the name of the field to bind to
+ * @param options a map (value=label) of all the available options
+ * @param separator the html tag or other character list that should be used to
+ *    separate each option.  Typically '&nbsp;' or '<br>'
+ * @param attributes any additional attributes for the element (such as class
+ *    or CSS styles or size
+*#
+#macro( springFormCheckboxes $path $options $separator $attributes )
+    #springBind($path)
+    #foreach($option in $options.keySet())
+        <input type="checkbox" name="${status.expression}" value="${option}"
+        #foreach($item in $status.value)
+            #if($item == $option) checked="checked" #end
+        #end
+        ${attributes} #springCloseTag()
+        ${options.get($option)} ${separator}
+    #end
+    <input type="hidden" name="_${status.expression}" value="on"/>
+#end
+
+#**
+ * springShowErrors
+ *
+ * Show validation errors for the currently bound field, with
+ * optional style attributes.
+ *
+ * @param separator the html tag or other character list that should be used to
+ *    separate each option. Typically '<br>'.
+ * @param classOrStyle either the name of a CSS class element (which is defined in
+ *    the template or an external CSS file) or an inline style.  If the value passed in here
+ *    contains a colon (:) then a 'style=' attribute will be used, else a 'class=' attribute
+ *    will be used.
+*#
+#macro( springShowErrors $separator $classOrStyle )
+    #foreach($error in $status.errorMessages)
+        #if($classOrStyle == "")
+            <b>${error}</b>
+        #else
+            #if($classOrStyle.indexOf(":") == -1)
+                #set($attr="class")
+            #else
+                #set($attr="style")
+            #end
+            <span ${attr}="${classOrStyle}">${error}</span>
+        #end
+        ${separator}
+    #end
+#end
+
+#**
+ * springCloseTag
+ *
+ * Simple macro to close an HTML tag that has no body with '>' or '/>',
+ * depending on the value of a 'springXhtmlCompliant' variable in the
+ * template context.
+ *#
+#macro( springCloseTag )#if($springXhtmlCompliant)/>#else>#end #end
+
+#**
+ *
+#macro(zz91UlTag $attributes $urlPrefix $id $name $objList  )
+ <ul $attributes>
+  #foreach($obj in $objList)
+   <li>·<a href="123${obj.get($id)}.htm">$obj[$name]</a></li>
+  #end
+ </ul>
+#end
+*#
+#macro(zz91UlTag $attributes $urlPrefix  $objList  )
+ <ul $attributes>
+  #set ($var1="newsId")
+  #evaluate("obj.$var1")
+  #foreach($obj in $objList)
+   <li>·<a href='123#evaluate("$obj.$var1").htm'>$obj.newsName</a></li>
+  #end
+ </ul>
+#end
+
+#**
+ * 根据总记录数计算总页数
+ * totalRecords 总记录数
+ * totalPages  总页数
+ *#
+#macro(pagePlan $pageDTO $totalRecords )
+  #set($page=$totalRecords/$!{pageDTO.pageSize})
+  #set($totalPages=$page+1)
+   #set($records=$!{totalRecords}/$!{pageDTO.pageSize})
+	   #if($records==0)
+		  #set($totalPages=$totalPages-1)
+	   #end
+#end
+##通用分页宏,查询参数直接跟在url后面,主要用于生意管家等对URL静态化要求不高的页面
+#macro(pageBar $totalPages $currentPage $suffixUrl)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+		#if($currentPage/$itemCountPerPage>0)
+			#set($start=($currentPage/$itemCountPerPage)*$itemCountPerPage)
+		#else
+			#set($start=1)
+		#end
+		#if($currentPage > $itemCountPerPage)
+			#set($startPage=$start - 1)
+			<a href="?p=$startPage${suffixUrl}">...</a>
+		#end
+		#if($currentPage+$itemCountPerPage<$totalPages)
+			#set($end=$start+9)
+		#elseif($totalPages<$itemCountPerPage)
+			#set($end=$totalPages)
+		#else
+			#set($end=$itemCountPerPage)
+		#end
+		#foreach($i in [$start..$end])
+			#if($currentPage==$i)
+				<a href="?p=$i${suffixUrl}" class="click">$i</a>
+			#else
+				<a href="?p=$i${suffixUrl}">$i</a>
+			#end
+		#end
+		#if($currentPage+ 10<$totalPages)
+			#set($endPage=$end + 1)
+			<a href="?p=$endPage${suffixUrl}">...</a>
+		#end
+	#end
+#end
+
+##通用分页宏,查询参数静态化后编码进url,主要用于前台等需要SEO的页面
+#macro(staticPageBar $totalPages $currentPage $url)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+		#if($currentPage/$itemCountPerPage>0)
+			#set($start=($currentPage/$itemCountPerPage)*$itemCountPerPage)
+		#else
+			#set($start=1)
+		#end
+		#if($currentPage >= $itemCountPerPage)
+			#set($startPage=$start - 1)
+			<a href="${url}_p${startPage}.htm" style='color:red'>...</a>
+		#end
+		#if($currentPage+$itemCountPerPage<$totalPages)
+			#set($end=$start+9)
+		#elseif($totalPages<=$currentPage+$itemCountPerPage)
+			#set($end=$totalPages)
+		#else
+			#set($end=$itemCountPerPage)
+		#end
+		#foreach($i in [$start..$end])
+			#if($currentPage==$i)
+				<a href="${url}_p${i}.htm" style='color:red'>$i</a>
+			#else
+				<a href="${url}_p${i}.htm">$i</a>
+			#end
+		#end
+		#if($currentPage+ 10<$totalPages)
+			#set($endPage=$end + 1)
+			<a href="${url}_p${endPage}.htm">...</a>
+		#end
+	#end
+#end
+
+##通用分页宏2,查询参数直接跟在url后面,主要用于生意管家等对URL静态化要求不高的页面
+#macro(pageBar2 $totalRecords $totalPages $currentPage $suffixUrl)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+	<div id="pageleft">
+		共<b>$!{totalRecords}</b>条信息&nbsp;&nbsp;<b>$!{currentPages}</b>/<b>$!{totalPages}</b> 页&nbsp;&nbsp;<b>10</b> /页
+	</div>
+	<div align="right" id="pagetop">
+	  <font color="#666666">
+	  	首页
+  	  </font>
+	  	#if($currentPage > 1)
+	  		#set($prevPage=$currentPage - 1)
+	  		<a href="?p=$prevPage">上一页</a>
+	  	#end
+
+	  	#if($currentPage < $totalPages)
+	  		#set($nextPage=$currentPage + 1)
+	  		<a href="?p=$nextPage">下一页</a>
+	  	#end
+
+	  <a href="?p=$totalPages">尾页</a>
+	</div>
+	#end
+#end
+
+#macro(pageBar3 $totalPages $currentPage $suffixUrl)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+		#if($currentPage/$itemCountPerPage>0)
+			#set($start=($currentPage/$itemCountPerPage)*$itemCountPerPage)
+		#else
+			#set($start=1)
+		#end
+		#if($!{currentPage}>1)
+			#set($prePage=$!{currentPage} - 1)
+			<a href="$!{suffixUrl}page=1" title="首 页" style="margin-right:5px;">首 页</a>
+			<a href="$!{suffixUrl}page=$!{prePage}" title="上一页" style="margin-right:5px;">上一页</a>
+		#end
+		#if($currentPage+$itemCountPerPage<$totalPages)
+			#set($end=$start+9)
+		#elseif($totalPages<=$currentPage+$itemCountPerPage)
+			#set($end=$totalPages)
+		#else
+			#set($end=$itemCountPerPage)
+		#end
+		#foreach($i in [$start..$end])
+			#if($currentPage==$i)
+				<a href="$!{suffixUrl}page=$i" style='color:red'>$i</a>
+			#else
+				<a href="$!{suffixUrl}page=$i">$i</a>
+			#end
+		#end
+		#if($!{currentPage}<$!{totalPages})
+			#set($nextPage=$!{currentPage} + 1)
+			<a href="$!{suffixUrl}page=$!{nextPage}" title="下一页" style="margin-right:5px;">下一页</a>
+			<a href="$!{suffixUrl}page=$!{totalPages}" title="未 页" style="margin-right:5px;">未 页</a>
+		#end
+	#end
+#end
+
+##通用分页宏2,查询参数静态化后编码进url,主要用于前台等需要SEO的页面,并且不显示首页、尾页和总条数
+#macro(staticPageBar2 $totalPages $currentPage $url)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+	  	#if($currentPage > 1)
+	  		#set($prevPage=$currentPage - 1)
+	  		<a href="${url}_p${prevPage}.htm">上一页</a>
+	  	#end
+
+	  	#if($currentPage < $totalPages)
+	  		#set($nextPage=$currentPage + 1)
+	  		<a href="${url}_p${nextPage}.htm">下一页</a>
+	  	#end
+	#end
+#end
+
+##显示广告
+#macro(showAds $adsList $adsPlacesId)
+	#foreach($ads in $adsList)
+		#foreach($ad in $ads.list)
+			#if($!{ad.adsPlaceId}==$adsPlacesId)
+				#set($suffixLength=$ad.picAddress.length()- 3)
+				#if($ad.picAddress.substring($suffixLength).toLowerCase()=="swf")
+					<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="${ad.width}" height="${ad.height}" >
+					  <param name="movie" value="$!{address.baseConfig_resource_url}/$!{ad.picAddress}?url=$!{address.server}/guangGao$!{ad.id}.htm" />
+					  <param name="quality" value="high" />
+					  <param name='wmode' value='transparent'>
+					  <embed src="$!{address.baseConfig_resource_url}/$!{ad.picAddress}?url=$!{address.server}/guangGao$!{ad.id}.htm" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="${ad.width}" height="${ad.height}"></embed>
+					</object>
+				#else
+					<a href='$!{address.server}/guangGao$!{ad.id}.htm' target='_blank'><img src='$!{address.baseConfig_resource_url}/$!{ad.picAddress}' alt='$!{ad.name}' border='0' /></a>
+				#end
+			#end
+		#end
+	#end
+#end
+
+#macro(printAds $ad $target)
+	<script type="text/javascript">
+		zz91Ads.show($ad,'$target','$!{address.server}');
+	</script>
+#end
+
+##控制字符串长度
+
+
+##新分页列表生成 20101103新建 l
+#macro(getPageBarList $totalPages $currentPage $start $end $suffixUrl)
+	#*
+	#set($prePage=-1)
+	#set($afterPage=1)
+	#if($currentPage>1)
+		#set($prePage=$currentPage+$prePage)
+	#end
+	#if($currentPage<$totalPages)
+		#set($prePage=$currentPage+$afterPage)
+	#end
+	#if(!$prePage=-1)
+		<a href="?p=$prePage${suffixUrl}">上一页</a>
+	#end
+	*#
+	#foreach($i in [$start..$end])
+		#if($i<=$totalPages)
+			#if($currentPage==$i)
+				<a href="?p=$i${suffixUrl}" class="click">$i</a>
+			#else
+				<a href="?p=$i${suffixUrl}">$i</a>
+			#end
+		#end
+	#end
+	#*
+	#set(!$afterPage=1)
+		<a href="?p=$afterPage${suffixUrl}">下一页</a>
+	#end
+	*#
+#end
+##新分页 20101103新建 l
+#macro(newPageBar $totalPages $currentPage $suffixUrl)
+	#if($totalPages>0)
+		#set($itemCountPerPage=10)
+		#if($totalPages==1)
+			#getPageBarList($totalPages $currentPage 1 $totalPages $suffixUrl)
+		#else
+			#set($intervalNum=5)
+			#set($temppage=${currentPage}-$intervalNum)
+			#if($temppage>0)
+				#set($start=$temppage)
+			#else
+				#set($start=1)
+			#end
+			#set($temppage=${currentPage}+$intervalNum)
+			#if($temppage<$totalPages)
+				#set($end=$temppage)
+			#else
+				#set($end=$totalPages)
+			#end
+			#getPageBarList($totalPages $currentPage $start $end $suffixUrl)
+		#end
+	#end
+#end
+
+##myrc左侧菜单，选中焦点设置
+#macro(leftMenu $fullMenuCode $simpleMenuCode $topMenuCode)
+	<script type="text/javascript" >
+		#if($!{fullMenuCode}!="")
+	    	pulssub("$!{fullMenuCode.substring(0,2)}");
+		#end
+    	getfocus("$!{fullMenuCode}", "$!{simpleMenuCode}", "$!{topMenuCode}");
+    </script>
+#end
+
+#macro(pageNavStyle )
+	<style type="text/css">
+		.pages {
+        /*      float:right;*/
+                margin-top:10px;
+        }
+        .pages a{
+                border:1px solid #cbdbe5;
+                padding:3px 6px;
+                margin:0 2px;
+              
+                text-decoration:none
+        }
+        .pages a:hover {
+                border:1px solid #cbdbe5;
+                padding:3px 6px;
+                margin:0 2px;
+                text-decoration:none;
+                color:#333;
+				background-color:#CCC;
+        }
+        .pages a.click {
+			    padding:3px 6px;
+				margin:0 2px;
+                color:#040;
+                font-weight:bold;
+                border:1px solid #CCC;
+				background-color:#CCC;
+        }
+        .pages a:hover.click {
+                color:#ff6600;
+                font-weight:bold;
+                border:1px solid #cbdbe5;
+				cursor:default;
+        }
+	</style>
+#end
+
+#macro(myrcPageNav $pageContext $url $suffixUrl $template)
+	#set($totalPage=((${pageContext.totalRecords} - 1)/${pageContext.pageSize})+1)
+	#set($currentPage=(${pageContext.startIndex}/${pageContext.pageSize})+1)
+	<div class="pages" >
+    	<a href='$!{url}?startIndex=0&pageSize=$!{currentPage.pageSize}&$!{suffixUrl}' >首页</a>
+    	#set($startIndex=${pageContext.startIndex} - ${pageContext.pageSize})
+    	#if(0 >= $startIndex)
+    		#set($startIndex = 0)
+    	#end
+    	<a href='$!{url}?startIndex=$!startIndex&pageSize=$!{currentPage.pageSize}&$!{suffixUrl}' >上一页</a>
+    	#foreach($jj in [-5..5])
+    		#if(($currentPage+$jj)>=0 && $totalPage > ($currentPage+$jj))
+    			#set($startIndex = ($currentPage + $jj)*${pageContext.pageSize} )
+    			#set($nowPage = $currentPage + $jj + 1)
+    			#if($startIndex == ${pageContext.startIndex})
+    				<a href="javascript:void(0)" class='click'>$nowPage</a>
+    			#else
+    				<a href='$!{url}?startIndex=$startIndex&pageSize=$!{currentPage.pageSize}&$!{suffixUrl}' >$nowPage</a>
+    			#end
+    		#end
+    	#end
+    	#set($startIndex=${pageContext.startIndex} + ${pageContext.pageSize})
+    	#if($startIndex > ${pageContext.totalRecords})
+    		#set($startIndex=(${totalPage} - 1)*${pageContext.pageSize})
+    	#end
+    	<a href='$!{url}?startIndex=$!startIndex&pageSize=$!{currentPage.pageSize}&$!{suffixUrl}' >下一页</a>
+    	#set($startIndex=(${totalPage} - 1)*${pageContext.pageSize})
+    	<a href='$!{url}?startIndex=$!startIndex&pageSize=$!{currentPage.pageSize}&$!{suffixUrl}' >末页</a>
+	</div>
+#end
+
+#macro(staticPageNav $pageContext $uri $suffixUrl $template)
+	#set($totalPage=((${pageContext.totalRecords} - 1)/${pageContext.pageSize})+1)
+	#set($currentPage=(${pageContext.startIndex}/${pageContext.pageSize})+1)
+	<div class="pages" >
+    	<a href='$!{uri}$!{suffixUrl}--s0--l$!{pageContext.pageSize}.htm' >首页</a>
+    	#set($startIndex=${pageContext.startIndex} - ${pageContext.pageSize})
+    	#if(0 >= $startIndex)
+    		#set($startIndex = 0)
+    	#end
+    	<a href='$!{uri}$!{suffixUrl}--s$!{startIndex}--l$!{pageContext.pageSize}.htm' >上一页</a>
+    	#foreach($jj in [-5..5])
+    		#if(($currentPage+$jj)>=0 && $totalPage > ($currentPage+$jj))
+    			#set($startIndex = ($currentPage + $jj)*${pageContext.pageSize} )
+    			#set($nowPage = $currentPage + $jj + 1)
+    			#if($startIndex == ${pageContext.startIndex})
+    				<a href="#" class='click'>$nowPage</a>
+    			#else
+    				<a href='$!{uri}$!{suffixUrl}--s$!{startIndex}--l$!{pageContext.pageSize}.htm' >$nowPage</a>
+    			#end
+    		#end
+    	#end
+    	#set($startIndex=${pageContext.startIndex} + ${pageContext.pageSize})
+    	#if($startIndex > ${pageContext.totalRecords})
+    		#set($startIndex=(${totalPage} - 1)*${pageContext.pageSize})
+    	#end
+    	<a href='$!{uri}$!{suffixUrl}--s$!{startIndex}--l$!{pageContext.pageSize}.htm' >下一页</a>
+    	#set($startIndex=(${totalPage} - 1)*${pageContext.pageSize})
+    	<a href='$!{uri}$!{suffixUrl}--s$!{startIndex}--l$!{pageContext.pageSize}.htm' >末页</a>
+	</div>
+#end
+
+#macro(printTitle $word $maxSize $prefix)#set($word=$word.trim())#if($word.length() >$maxSize)$word.substring(0, $maxSize)$prefix#else$word#end#end
+
+#macro(printProductType $code $left $right)#if($code=="10331000")$!{left}供应$!{right}#elseif($code=="10331001")$!{left}求购$!{right}#elseif($code=="10331002")$!{left}合作$!{right}#end#end
+

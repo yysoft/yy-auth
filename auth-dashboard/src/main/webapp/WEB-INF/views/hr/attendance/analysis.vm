@@ -1,0 +1,65 @@
+<style >
+div {margin-top:10px;}
+</style>
+
+<script type="text/javascript">
+	function resetMonth (){
+		window.location.href=Context.ROOT+"/hr/attendance/analysis.htm?targetMonth="+Ext.get("targetMonth").dom.value;
+	}
+	
+##	function resetWorkf (){
+##		var workf=Ext.query("#targetWorkf")[0].value;
+##		Ext.each(Ext.query(".cssworkf"),function(item,idx,allItems){
+##			item.value=workf;
+##		});
+##	}
+##	
+##	function resetWorkt (){
+##		var workt=Ext.query("#targetWorkt")[0].value;
+##		Ext.each(Ext.query(".cssworkt"),function(item,idx,allItems){
+##			item.value=workt;
+##		});
+##	}
+	
+##	function submitForm(){
+##		var dayArr=new Array();
+##		var workfArr=new Array();
+##		var worktArr=new Array();
+##		
+##		Ext.each(Ext.query(".chk"),function(item,idx,allItems){
+##			if(item.checked){
+##				dayArr.push(item.value);
+##				workfArr.push(Ext.query("#workf-"+item.value)[0].value);
+##				worktArr.push(Ext.query("#workt-"+item.value)[0].value);
+##			}
+##		});
+##		
+##		Ext.query("#dayArr")[0].value=dayArr.join(",");
+##		Ext.query("#workfArr")[0].value=workfArr.join(",");
+##		Ext.query("#worktArr")[0].value=worktArr.join(",");
+##		
+##		return true;
+##	}
+</script>
+
+<div style="padding:20px;">
+	<div style="color:red;">选择统计月份</div>
+    <form action="#springUrl('/hr/attendance/doAnalysis.htm')" method="post" onsubmit="return submitForm();">  
+		
+##		<input type="hidden" name="dayArr" id="dayArr" value="" />
+##		<input type="hidden" name="workfArr" id="workfArr" value=""/>
+##		<input type="hidden" name="worktArr" id="worktArr" value=""/>
+		##<input type="hidden" name="targetMonth" value="$!{targetMonth}" />
+        
+		<div >
+            统计月份：<input name="targetMonth" id="targetMonth" value="$!{targetMonth}" onblur="resetMonth();"></input>
+        	<div style="color:red;">格式： yyyy-MM 例：2012-01</div>
+        </div>
+		
+        <div>
+        <input type="submit" value="确认无误，马上统计" style="width:200px;height:24px;" />
+        </div>
+    
+    </form>
+</div>
+	

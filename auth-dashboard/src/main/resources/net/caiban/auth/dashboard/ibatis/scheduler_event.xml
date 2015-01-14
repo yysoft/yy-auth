@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="schedulerEvent">
+
+	<typeAlias alias="schedulerEvent" type="net.caiban.auth.dashboard.domain.staff.SchedulerEvent" />
+	
+	<sql id="fullColumn">
+		e.id,
+		e.text,
+		e.details,
+		e.start_date,
+		e.end_date,
+		e.assign_account,
+		e.owner_account,
+		e.persent,
+		e.dept_code,
+		e.importance,
+		e.gmt_created,
+		e.gmt_modified
+	</sql>
+	
+	<resultMap class="schedulerEvent" id="eventResult">
+		<result property="id" column="id"/>
+		<result property="text" column="text"/>
+		<result property="details" column="details"/>
+		<result property="startDate" column="start_date"/>
+		<result property="endDate" column="end_date"/>
+		<result property="assignAccount" column="assign_account"/>
+		<result property="ownerAccount" column="owner_account"/>
+		<result property="persent" column="persent" />
+		<result property="deptCode" column="dept_code" />
+		<result property="importance" column="importance" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+
+	<insert id="insertEvent" parameterClass="schedulerEvent">
+		insert into scheduler_event(
+		text,
+		details,
+		start_date,
+		end_date,
+		assign_account,
+		owner_account,
+		persent,
+		importance,
+		dept_code,
+		gmt_created,
+		gmt_modified)
+		values
+		(
+		#text#,
+		#details#,
+		#startDate#,
+		#endDate#,
+		#assignAccount#,
+		#ownerAccount#,
+		#persent#,
+		#importance#,
+		#deptCode#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+		select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteEvent" parameterClass="java.lang.Integer">
+		delete from scheduler_event where id=#id#
+	</delete>	
+	
+	<update id="updateEvent" parameterClass="schedulerEvent" >
+		update scheduler_event set 
+			owner_account=#ownerAccount#,
+			text=#text#,
+			details=#details#,
+			start_date=#startDate#,
+			end_date=#endDate#,
+			dept_code=#deptCode#,
+			gmt_modified=now() 
+		where id=#id#
+	</update>	
+	
+	<select id="queryEvent" parameterClass="java.util.HashMap" resultMap="eventResult">
+		select  
+		<include refid="schedulerEvent.fullColumn" />
+		from scheduler_event e
+		where  
+		#endDate#>start_date and end_date>=#startDate#
+		<dynamic>
+			<isNotEmpty property="ownerAccount" prepend="and">
+				owner_account=#ownerAccount#
+			</isNotEmpty>
+		</dynamic>
+		 <dynamic>
+			<isNotEmpty property="deptCode" prepend="and">
+				dept_code=#deptCode#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryAssociatedEvent" resultMap="eventResult" parameterClass="java.lang.Integer">
+		select 
+		<include refid="schedulerEvent.fullColumn" />
+		from scheduler_event e
+			where e.id in(select event_id from scheduler_report_event re where re.report_id=#reportId#)
+	</select>
+	
+	<update id="updateEventProcess" parameterClass="java.util.HashMap">
+		update scheduler_event set 
+			persent=#persent#,
+			importance=#importance#,
+			gmt_modified=now() 
+		where id=#id#
+	</update>
+	
+	<select id="querySchedulerEvent" parameterClass="java.lang.Integer" resultMap="eventResult">
+		select
+		<include refid="schedulerEvent.fullColumn" />
+		from scheduler_event e where e.id=#id#
+		limit 1
+	</select>
+	
+	<select id="query" resultMap="eventResult">
+		select
+			<include refid="schedulerEvent.fullColumn" />
+		from scheduler_event e
+	</select>
+</sqlMap>

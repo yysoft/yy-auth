@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="dept">
+	<typeAlias alias="dept" type="net.caiban.auth.dashboard.domain.staff.Dept" />
+	<typeAlias alias="authRight" type="net.caiban.auth.dashboard.domain.auth.AuthRight" />
+
+	<resultMap  class="dept" id="deptResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="code" column="code" />
+		<result property="note" column="note" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<resultMap class="authRight" id="rightResult">
+		<result property="id" column="id" />
+		<result property="code" column="code" />
+		<result property="sort" column="sort" />
+		<result property="content" column="content" />
+		<result property="menu" column="menu" />
+		<result property="menuUrl" column="menu_url" />
+		<result property="menuCss" column="menu_css" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+
+	<sql id="fullColumn">
+		d.id,
+		d.name,
+		d.code,
+		d.note,
+		d.gmt_created,
+		d.gmt_modified
+	</sql>
+	
+	<select id="queryChild" parameterClass="java.lang.String"
+		resultMap="deptResult">
+		select
+		<include refid="dept.fullColumn" />
+		from dept d where d.code like concat(#value#,'____')
+	</select>
+	
+	<select id="queryRightOfDept" parameterClass="java.util.HashMap" resultMap="rightResult">
+		select
+		ar.`id`,
+		ar.`code`,
+		ar.`name`,
+		ar.`sort`,
+		ar.`content`,
+		ar.`menu`,
+		ar.`menu_url`,
+		ar.`menu_css`,
+		ar.`gmt_created`,
+		ar.`gmt_modified`
+		from dept_right dr 
+		inner join auth_right ar on dr.auth_right_id = ar.id
+		where ar.code like concat(#parentCode#,'%')
+		and dr.dept_id=#deptId#
+	</select>
+	
+	<select id="queryDeptIdByAccount" parameterClass="java.lang.String" resultClass="java.lang.Integer" >
+		select d.id 
+		from dept d
+		where d.code = 
+		(select dept_code from staff s where s.account=#value# limit 1);
+	</select>
+	
+	<select id="queryChildRightOfDept" parameterClass="java.util.HashMap" resultMap="rightResult">
+		select
+		ar.`id`,
+		ar.`code`,
+		ar.`name`,
+		ar.`sort`,
+		ar.`content`,
+		ar.`menu`,
+		ar.`menu_url`,
+		ar.`menu_css`,
+		ar.`gmt_created`,
+		ar.`gmt_modified`
+		from dept_right dr 
+		inner join auth_right ar on dr.auth_right_id = ar.id
+		where ar.code like concat(#parentCode#,'____')
+		and dr.dept_id=#deptId#
+	</select>
+	
+	<select id="countChild" parameterClass="java.lang.String" resultClass="java.lang.Integer" >
+		select count(*) from dept where code like concat(#value#, '_%')
+	</select>
+	
+	<select id="queryRightIdOfDept" parameterClass="java.lang.Integer" resultClass="java.lang.Integer" >
+		select auth_right_id from dept_right
+		where dept_id=#value#
+	</select>
+	
+	<insert id="insertDeptRight" parameterClass="java.util.HashMap" >
+		insert into dept_right(dept_id,auth_right_id,gmt_created,gmt_modified)
+		values(#deptId#,#rightId#,now(),now())
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteDeptRight" parameterClass="java.util.HashMap" >
+		delete from dept_right
+		where dept_id=#deptId# and auth_right_id=#rightId#
+	</delete>
+	
+	<delete id="deleteDept" parameterClass="java.lang.String" >
+		delete from dept
+		where code like concat(#value#,'%')
+	</delete>
+	
+	<delete id="deleteDeptBs" parameterClass="java.lang.String" >
+		delete from bs_dept
+		where dept_id in
+		(select d.id from dept d where d.code like concat(#value#,'%'))
+	</delete>
+	
+	<delete id="deleteRightByDept" parameterClass="java.lang.String">
+		delete from dept_right 
+		where dept_id in
+		(select d.id from dept d where d.code like concat(#value#,'%'))
+	</delete>
+	
+	<insert id="insertDept" parameterClass="dept" >
+		insert into dept(`name`,`code`,`note`,`gmt_created`,`gmt_modified`)
+		values(#name#,#code#,#note#,now(),now()) 
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<select id="queryOneDept" parameterClass="java.lang.String" resultMap="deptResult">
+		select 
+			<include refid="dept.fullColumn" />
+		from dept d where d.code =#value#
+		limit 1
+	</select>
+	
+	<update id="updateDept" parameterClass="dept" >
+		update dept set
+		name=#name#,
+		note=#note#,
+		gmt_modified=now()
+		where id=#id#
+	</update>
+	
+	<select id="queryMaxCodeOfChild" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select max(code) from dept
+		where code like concat(#value#,'____')
+	</select>
+
+</sqlMap>

@@ -1,0 +1,155 @@
+<!-- for include js code -->
+<script type="text/javascript" >
+	Ext.namespace("com.zz91.zzwork");
+	Ext.QuickTips.init();
+	Ext.form.Field.prototype.msgTarget = 'under';
+	Ext.BLANK_IMAGE_URL = "#springUrl('/js/ext32/resources/images/default/s.gif')";
+	
+	var Context = new function(){
+		this.ROOT = "#springUrl('')";
+		this.ROOT_IMAGE="http://img1.zz91.com/zzwork";
+		this.PAGE_SIZE = 20;
+		this.LOGIN_USER="$!{loginuser}";
+	}
+	
+	function timestamp(){
+	    var timestamp = Date.parse(new Date());
+	    return timestamp;
+	}
+	
+	Ext.override(Ext.form.BasicForm,{
+	    findField : function(id){
+	        var field = this.items.get(id);
+	        if(!field){
+	            this.items.each(function(f){
+	                if(f.isXType('radiogroup')||f.isXType('checkboxgroup')){
+	                    f.items.each(function(c){
+	                        if(c.isFormField && (c.dataIndex == id || c.id == id || c.getName() == id)){
+	                            field = c;
+	                            return false;
+	                        }
+	                    });
+	                }
+                if(f.isFormField && (f.dataIndex == id || f.id == id || f.getName() == id)){
+                    field = f;
+                    return false;
+                }
+	            });
+	        }
+	        return field || null;
+	    }
+	});
+	
+	var MESSAGE = new function(){
+		this.title =  "信息提示";
+		this.picTitleInfo = "<img src='${contextPath}/themes/boomy/infoabout24.png' />"; 
+		this.unValidate = "表单填写有错误，请仔细检查一下表单 :)";
+		this.saveFailure = "表单没有被保存<br /><br />请多尝试几次，如果还有问题请 <a href='mailto:mays@caiban.net' >联系我们</a>";
+		this.loadError = "数据没有被载入<br /><br />请多尝试几次，如果还有问题请 <a href='mailto:mays@caiban.net' >联系我们</a>";
+		this.confirmDelete = "确定要删除吗?";
+		this.submitFailure = "请求没有被正确处理,请检查网络是否连接正常!";
+		this.saveSuccess = "保存成功";
+		this.noRecord = "没有记录";
+		this.needOneRecord="请选择一条记录";
+		this.noAuth = "你没有权限这么做,如需帮助,请<a href='mailto:mays@caiban.net' >联系我们</a>";
+		this.ajaxError = "噢！发生了一点错误，请再试一次<br/>如果还是这样，请 <a href='mailto:mays@caiban.net' >联系我们</a>";
+		this.paging = {
+			displayMsg:'显示第 {0} - {1} 第记录,共 {2} 条',
+			emptyMsg:'没有可显示的记录',
+			beforePageText:'第',
+			afterPageText:'页,共{0}页',
+			paramNames:{start:'start', limit:'limit', sort:'sort', dir:'dir'}
+		};
+		this.saving = "正在保存...";
+		this.deleting = "正在删除...";
+		this.loading = "正在载入...";
+		this.uploading = "正在上传...";
+		this.uploadFailure = "文件没有被上传：{0}";
+		this.deleteSuccess = "选定记录已被删除";
+		this.loadmask={"msg":"数据加载中，请稍候..."};
+		this.savemask={"msg":"正在保存数据，请稍候..."};
+		this.loadFailure="数据加载发生错误...";
+	}
+	
+	com.zz91.zzwork.utils = function(){
+		var msgCt;
+
+	    function createBox(t, s){
+	        return ['<div class="msg">',
+	                '<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>',
+	                '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc"><h3>', t, '</h3>', s, '</div></div></div>',
+	                '<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>',
+	                '</div>'].join('');
+	    }
+	    
+	   	return {
+			Msg : function(title, format){
+    	       	if(!msgCt){
+               		msgCt = Ext.DomHelper.insertFirst(document.body, {id:'msg-div'}, true);
+               	}
+				
+	           	msgCt.alignTo(document, 't-t');
+	           	var s = String.format.apply(String, Array.prototype.slice.call(arguments, 1));
+	           	var m = Ext.DomHelper.append(msgCt, {html:createBox(title, s)}, true);
+	           	m.slideIn('t').pause(1).ghost("t", {remove:true});
+	   		}
+       	};
+	}();
+	
+	//AJAX事件
+	Ext.Ajax.on('requestcomplete',function(conn,response,options){
+		if(options.isUpload){
+			return true;
+		}
+
+		if(typeof(response.getResponseHeader("sessionstatus"))!= 'undefined'){
+			//TODO 用户没有登录
+			com.zz91.zzwork.UserLoginWin(function(){
+    			window.location.href=Context.ROOT+"/index.htm";
+    		});
+		}
+	}, this);
+
+	Ext.Ajax.on('requestexception',function(conn,response,options){
+        //response.responseText
+		//if("${debug}"=="true"){
+			if(!Ext.getCmp("errorWin")){
+    			var win = new Ext.Window({
+    				id:"errorWin",
+    				iconCls:"infoabout16",
+    				title:MESSAGE.title,
+    				width:700,
+    				autoHeight:true,
+    				modal:true,
+    				items:[{
+    					xtype:"panel",
+    					region:"center",
+    					layout:"fit",
+    					html:options.url+"<br/>"+response.responseText,
+    					height:400,
+    					autoScroll:true
+    				}],
+    				bbar:["->",{
+    					iconCls:"mailsend16",
+    					text:"发送错误报告",
+    					handler:function(btn){
+    						//TODO 发送错误信息的方法
+    						caiban.utils.Msg(MESSAGE.title,"报告已发送！～");
+    					}
+    				}]
+    			});
+    			win.show();
+			}
+		/*
+		}else{
+			Ext.MessageBox.show({
+				title:Context.MSG_TITLE,
+				msg : "#"+response.status+"<br/>"+MESSAGE.ajaxError,
+	          	buttons:Ext.MessageBox.OK,
+	          icon:Ext.MessageBox.ERROR
+	       	});
+		}
+		*/
+	},this);
+	
+</script>

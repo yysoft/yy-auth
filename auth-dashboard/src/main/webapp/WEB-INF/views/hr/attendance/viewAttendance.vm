@@ -1,0 +1,76 @@
+<style >
+div {margin-top:10px;}
+
+table td {
+	padding:5px;
+	text-align:right;
+}
+
+table th {
+	padding:5px;
+	text-align:center;
+}
+</style>
+
+<div style="padding:20px;">
+	##<div style="color:red;">选择统计月份的工作时间,默认选中为工作日时间</div>
+		
+		<div >
+            时间：<span style="color:red;">$!{targetMonth}</span>
+			班次：$!{scheduleName}
+##			<input name="targetMonth" id="targetMonth" value="$!{targetMonth}" onblur="resetMonth();"></input>
+##        	<div style="color:red;">格式： yyyy-MM 例：2012-01</div>
+        </div>
+        
+        <div>
+			<table border="1" cellpadding="0" cellspacing="0">
+                <tr>
+					<th> </th>
+					<th>日期</th>
+					<th>星期</th>
+					<th>上班时间</th>
+					<th>下班时间</th>
+					<th title="当天">实际打卡时间</th>
+				</tr>
+            #foreach($md in $!{list})
+				<tr #if($!{md.detail.dayOfWeek} == 1 || $!{md.detail.dayOfWeek} == 7) style="background-color:#ccc;" #end>
+					<td >
+						#if("$!{md.workDay}"=="1")
+								<input type="checkbox" name="chk"  value="$!{md.detail.dayOfMonth}" class="chk" checked />
+							#else
+								<input type="checkbox" name="chk"  value="$!{md.detail.dayOfMonth}" class="chk" />
+						#end
+##						
+##						#if($!{md.dayOfWeek} == 1 || $!{md.dayOfWeek} == 7)
+##							<input type="checkbox" name="chk" value="$!{md.dayOfMonth}" class="chk" />
+##						#else
+##							<input type="checkbox" name="chk"  value="$!{md.dayOfMonth}" class="chk" checked />
+##						#end
+					</td>
+					<td>$!{md.detail.dayOfMonth}日</td>
+					<td>
+						#foreach($week in $!{weekName})
+							#if($velocityCount == $!{md.detail.dayOfWeek})
+								$week
+							#end
+						#end
+					</td>
+                    <td><input type="text" value="$!{md.workf}" class="cssworkf" name="workf" id="workf-$!{md.dayOfMonth}"/></td>
+                    <td><input type="text" value="$!{md.workt}" class="cssworkt" name="workt" id="workt-$!{md.dayOfMonth}"/></td>
+					<td style="color:red;">
+						#foreach($!{realWorkTime} in $!{userAttendance.get($!{md.detail.unixtime})})
+							$!date.format('HH:mm',${realWorkTime.time})
+						#end
+					</td>
+				</tr>
+			#end
+			</table>
+				
+        </div>
+        
+        ##<div>
+        ##<input type="submit" value="确认所填信息无误，马上统计" style="width:200px;height:24px;" />
+        ##</div>
+    
+</div>
+	

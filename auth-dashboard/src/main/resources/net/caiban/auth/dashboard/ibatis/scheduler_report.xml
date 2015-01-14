@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="schedulerReport">
+
+	<typeAlias alias="schedulerReport" type="net.caiban.auth.dashboard.domain.staff.SchedulerReport" />
+
+	<sql id="fullColumn">
+		re.id,
+		re.dept_code,
+		re.account,
+		re.text,
+		re.details,
+		re.compose_date,
+		re.year,
+		re.week,
+		re.gmt_created,
+		re.gmt_modified
+	</sql>
+	
+	<resultMap class="schedulerReport" id="reportResult">
+		<result property="id" column="id"/>
+		<result property="deptCode" column="dept_code"/>
+		<result property="account" column="account"/>
+		<result property="text" column="text"/>
+		<result property="details" column="details"/>
+		<result property="composeDate" column="compose_date"/>
+		<result property="year" column="year"/>
+		<result property="week" column="week"/>
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<insert id="insertReport" parameterClass="schedulerReport">
+		insert into scheduler_report(
+		dept_code,
+		account,
+		text,
+		details,
+		compose_date,
+		year,
+		week,
+		gmt_created,
+		gmt_modified)
+		values
+		(
+		#deptCode#,
+		#account#,
+		#text#,
+		#details#,
+		now(),
+		#year#,
+		#week#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+		select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<insert id="insertReportEvent" parameterClass="java.util.HashMap">
+		insert into scheduler_report_event(
+		event_id,
+		report_id,
+		gmt_created,
+		gmt_modified)
+		values
+		(
+		#eventId#,
+		#reportId#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+		select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<select id="queryOneReport" parameterClass="java.lang.Integer" resultMap="reportResult">
+		select  
+		<include refid="schedulerReport.fullColumn" />
+		from scheduler_report re where re.id=#id#
+		limit 1
+	</select>
+	
+	<select id="queryReport" resultMap="reportResult" parameterClass="java.util.HashMap">
+		select 
+		<include refid="schedulerReport.fullColumn" />
+		from scheduler_report re
+		where re.year=#year# and re.week=#week#
+		<dynamic>
+			<isNotEmpty property="account" prepend="and">
+				re.account=#account#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic>
+			<isNotEmpty property="deptCode" prepend="and">
+				re.dept_code=#deptCode#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>

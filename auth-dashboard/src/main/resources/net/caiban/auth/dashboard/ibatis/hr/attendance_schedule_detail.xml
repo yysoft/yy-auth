@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="attendanceScheduleDetail" >
+	<typeAlias alias="detail" type="net.caiban.auth.dashboard.domain.hr.AttendanceScheduleDetail" />
+	<typeAlias alias="detailSearch" type="net.caiban.auth.dashboard.domain.hr.AttendanceScheduleDetailSearch" />
+	
+	
+	<select id="count" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		select count(id) from attendance_schedule_detail
+		where schedule_id=#scheduleId# and gmt_month=#gmtMonth#
+	</select>
+	
+	<insert id="insert" parameterClass="detail" >
+		insert into attendance_schedule_detail
+			(`schedule_id`,`gmt_month`,`day_of_year`,`day_of_month`,
+			`day_of_week`,`day`,`workf`,`workt`,`unixtime`,`created_by`,
+			`modified_by`,`gmt_created`,`gmt_modified`)
+		values (#scheduleId#,#gmtMonth#,#dayOfYear#,#dayOfMonth#,#dayOfWeek#,
+			#day#,#workf#,#workt#,#unixtime#,#createdBy#,#modifiedBy#,now(),now())
+			
+		<selectKey keyProperty="id" resultClass="java.lang.Integer" >
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteSchedule" parameterClass="java.util.HashMap">
+		delete from attendance_schedule_detail 
+		where schedule_id=#scheduleId#
+		and gmt_month=#gmtMonth#
+	</delete>
+	
+	<resultMap class="detail" id="defaultResult">
+		<result property="scheduleId" columnIndex="1"/>
+		<result property="gmtMonth" columnIndex="2"/>
+		<result property="dayOfYear" columnIndex="3"/>
+		<result property="dayOfMonth" columnIndex="4"/>
+		<result property="dayOfWeek" columnIndex="5"/>
+		<result property="day" columnIndex="6"/>
+		<result property="workf" columnIndex="7"/>
+		<result property="workt" columnIndex="8"/>
+		<result property="unixtime" columnIndex="9"/>
+		<result property="createdBy" columnIndex="10"/>
+		<result property="modifiedBy" columnIndex="11"/>
+	</resultMap>
+	
+	<sql id="defaultColumn">
+		asd.`schedule_id`,asd.`gmt_month`,asd.`day_of_year`,asd.`day_of_month`,
+		asd.`day_of_week`,asd.`day`,asd.`workf`,asd.`workt`,asd.`unixtime`,
+		asd.`created_by`,asd.`modified_by`
+	</sql>
+	
+	<select id="queryDefault" parameterClass="detailSearch" resultMap="defaultResult">
+		select 
+			<include refid="attendanceScheduleDetail.defaultColumn" />
+		from attendance_schedule_detail asd
+		where 
+			asd.schedule_id=#scheduleId#
+			and asd.gmt_month=#gmtMonth#
+	</select>
+	
+</sqlMap>

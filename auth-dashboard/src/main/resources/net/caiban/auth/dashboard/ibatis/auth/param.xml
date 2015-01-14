@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="param">
+
+	<typeAlias alias="param" type="net.caiban.auth.dashboard.domain.auth.Param" />
+	
+	<resultMap class="param" id="paramResult">
+		<result property="id" column="id" />
+		<result property="types" column="types"/>
+		<result property="names" column="names"/>
+		<result property="key" column="key"/>
+		<result property="value" column="value" />
+		<result property="sort" column="sort"/>
+		<result property="used" column="used" />
+	<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+
+	<sql id="fullColumn">
+		p.`id`,
+		p.`types`,
+		p.`names`,
+		p.`key`,
+		p.`value`,
+		p.`sort`,
+		p.`used`,
+		p.`gmt_created`,
+		p.`gmt_modified`
+	</sql>
+	<select id="queryParam" resultMap="paramResult">
+		select
+			<include refid="param.fullColumn"/>
+		from param p
+		where used=1;
+	</select>
+</sqlMap>

@@ -1,0 +1,106 @@
+<script type="text/javascript" src="#springUrl('/app/auth/rightTree.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/dept/deptTree.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/dept/dept.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		var right=new com.zz91.zzwork.auth.right.Tree({
+			layout:"fit",
+			nodeUrl:Context.ROOT+"/dept/rigthChild.htm",
+			region:"center"
+		});
+		
+		var dept=new com.zz91.zzwork.dept.Tree({
+			id:DEPT.TREE,
+			region:"west",
+			layout:"fit",
+			width:300,
+			contextmenu:new Ext.menu.Menu({
+        		items:[{
+        			text:"添加部门",
+        			cls:"add16",
+        			handler:function(menu){
+						com.zz91.zzwork.dept.AddFormWin();
+        			}
+        		},{
+					text:"修改部门",
+					cls:"edit16",
+					handler:function(menu){
+						var d=dept.getSelectionModel().getSelectedNode();
+						com.zz91.zzwork.dept.EditFormWin(d.attributes["id"]);
+					}
+				},{
+					text:"删除部门",
+					cls:"delete16",
+					handler:function(menu){
+						var node = dept.getSelectionModel().getSelectedNode();
+						if(dept.getRootNode() == node){
+							return ;
+						}
+						
+						Ext.MessageBox.confirm(MESSAGE.title,MESSAGE.confirmDelete, function(btn){
+							if(btn != "yes"){
+								return false;
+							}
+							Ext.Ajax.request({
+                                url:Context.ROOT+"/dept/deleteDept.htm",
+                                params:{"code":node.attributes.data},
+                                success:function(response,opt){
+                                    var obj = Ext.decode(response.responseText);
+                                    if(obj.success){
+                                        node.remove();
+                                    }else{
+                                        Ext.MessageBox.show({
+                                            title:MESSAGE.title,
+                                            msg : MESSAGE.saveFailure,
+                                            buttons:Ext.MessageBox.OK,
+                                            icon:Ext.MessageBox.ERROR
+                                        });
+                                    }
+                                },
+                                failure:function(response,opt){
+                                    Ext.MessageBox.show({
+                                        title:MESSAGE.title,
+                                        msg : MESSAGE.submitFailure,
+                                        buttons:Ext.MessageBox.OK,
+                                        icon:Ext.MessageBox.ERROR
+                                    });
+                                }
+                        	});
+						});
+					}
+				}]
+    		})
+		});
+		
+		right.getRootNode().expand();
+		dept.getRootNode().expand();
+		
+		right.getLoader().on("beforeload",function(treeLoader,node){
+			this.baseParams["parentCode"]=node.attributes["data"];
+			var d=dept.getSelectionModel().getSelectedNode();
+			if(typeof(d)!="undefined"){
+				this.baseParams["deptId"]=d.attributes["id"];
+			}
+		});
+		
+		right.on("checkchange",function(node, checked){
+			var d=dept.getSelectionModel().getSelectedNode();
+			if(typeof(d)!="undefined"){
+    			com.zz91.zzwork.dept.UpdateDeptRight(d.attributes["id"], node.attributes["id"], checked);
+			}
+		});
+		
+		dept.on("click",function(node,e){
+			node.select();
+			right.getLoader().load(right.getRootNode());
+			if(!right.getRootNode().isExpanded()){
+    			right.getRootNode().expand();
+			}
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[dept,right]
+		})
+	})
+</script>

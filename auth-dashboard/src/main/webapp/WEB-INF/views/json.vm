@@ -1,0 +1,2 @@
+#set($layout="/layout/blank.vm")
+$!{json}

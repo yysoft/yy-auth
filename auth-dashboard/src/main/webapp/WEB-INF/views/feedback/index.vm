@@ -1,0 +1,24 @@
+<script type="text/javascript" src="#springUrl('/app/staff/feedback.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+
+		var grid = new com.zz91.zzwork.feedback.Grid({
+			region:"center"
+		});
+		
+		var form=new com.zz91.zzwork.feedback.Form({
+			region:"east",
+			split:true,
+			width:350
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[grid, form]
+		});
+		
+		grid.on("rowclick",function(g, rowIndex, e){
+			form.loadRecord(g.getStore().getAt(rowIndex));
+		});
+	})
+</script>

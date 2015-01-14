@@ -1,0 +1,298 @@
+.x-fieldset1 {
+	border: 0px solid #B5B8C8;
+	margin: 0px 3px 2px 0px;
+	display: block;
+}
+
+#button-grid .x-panel-body {
+	border: 1px solid #99bbe8;
+	border-top: 0 none;
+}
+
+.upload-icon {
+	background: url(icons/image_add.png) 
+	    !important;
+}
+
+#fi-button-msg {
+	border: 2px solid #ccc;
+	padding: 5px 10px;
+	background: #eee;
+	margin: 5px;
+	float: left;
+}
+
+/********page navgate bar style begin***********/
+#pages {
+/*	float:right;*/
+	margin-top:10px;
+}
+#pages a:link {
+	border:1px solid #cbdbe5;
+	padding:3px 6px;
+	margin:0 2px;
+	float:left;
+	text-decoration:none
+}
+#pages a:visited {
+	border:1px solid #cbdbe5;
+	padding:3px 6px;
+	margin:0 2px;
+	float:left;
+	text-decoration:none
+}
+#pages a:hover {
+	border:1px solid #cbdbe5;
+	padding:3px 6px;
+	margin:0 2px;
+	float:left;
+	text-decoration:none;
+	color:#ff6600;
+}
+#pages a:active {
+	border:1px solid #cbdbe5;
+	padding:3px 6px;
+	margin:0 2px;
+	float:left;
+	text-decoration:none
+}
+#pages a:link.click {
+	color:#ff6600;
+	font-weight:bold;
+	border:1px solid #fff;
+}
+
+#pages a:visited.click {
+	color:#ff6600;
+	font-weight:bold;
+	border:1px solid #fff;
+}
+
+#pages a:hover.click {
+	color:#ff6600;
+	font-weight:bold;
+	border:1px solid #fff;
+}
+
+#pages a:active.click {
+	color:#ff6600;
+	font-weight:bold;
+	border:1px solid #fff;
+}
+/********page navgate bar style end***********/
+
+
+.required {
+    color:#990000;
+    font-weight:bold;
+}
+
+/*********for image view************************/
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
+.images-view .x-panel-body{
+	background: white;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+.images-view .thumb{
+	background: #dddddd;
+	padding: 3px;
+	width:32px;
+	float:left;
+	margin-right:5px;
+}
+.images-view .thumb img{
+	height: 32px;
+	width: 32px;
+}
+.images-view .thumb-wrap{
+	float: left;
+	margin: 4px;
+	margin-right: 0;
+	padding: 5px;
+	max-width:200px;
+}
+.images-view .thumb-wrap span{
+	display: block;
+	overflow: hidden;
+	text-align: left;
+}
+
+.images-view .x-view-over{
+    border:1px solid #dddddd;
+    background: #efefef url(images/row-over.gif) repeat-x left top;
+	padding: 4px;
+}
+
+.images-view .x-view-selected{
+	background: #eff5fb url(images/selected.gif) no-repeat right bottom;
+	border:1px solid #99bbe8;
+	padding: 4px;
+}
+.images-view .x-view-selected .thumb{
+	background:transparent;
+}
+
+.images-view .loading-indicator {
+	font-size:11px;
+	background-image:url('../js/ext32/images/default/grid/loading.gif');
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left:20px;
+	margin:10px;
+}
+
+.avatar-view .x-panel-body{
+	background: white;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+.avatar-view .thumb{
+	background: #dddddd;
+	padding: 3px;
+}
+.avatar-view .thumb img{
+	height: 32px;
+	width: 32px;
+}
+.avatar-view .thumb-wrap{
+	float: left;
+	margin: 4px;
+	margin-right: 0;
+	padding: 5px;
+}
+.avatar-view .thumb-wrap span{
+	display: block;
+	overflow: hidden;
+	text-align: center;
+}
+
+.avatar-view .x-view-over{
+    border:1px solid #dddddd;
+    background: #efefef url(images/row-over.gif) repeat-x left top;
+	padding: 4px;
+}
+
+.avatar-view .x-view-selected{
+	background: #eff5fb url(images/selected.gif) no-repeat right bottom;
+	border:1px solid #99bbe8;
+	padding: 4px;
+}
+.avatar-view .x-view-selected .thumb{
+	background:transparent;
+}
+
+.avatar-view .loading-indicator {
+	font-size:11px;
+	background-image:url('../js/ext32/images/default/grid/loading.gif');
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left:20px;
+	margin:10px;
+}
+
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
+/*
+ * FileUploadField component styles
+ */
+.x-form-file-wrap {
+    position: relative;
+    height: 22px;
+}
+.x-form-file-wrap .x-form-file {
+	position: absolute;
+	right: 0;
+	-moz-opacity: 0;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+	z-index: 2;
+    height: 22px;
+}
+.x-form-file-wrap .x-form-file-btn {
+	position: absolute;
+	right: 0;
+	z-index: 1;
+}
+.x-form-file-wrap .x-form-file-text {
+    position: absolute;
+    left: 0;
+    z-index: 3;
+    color: #777;
+}
+
+/**
+  * message alert style 
+  */
+.msg .x-box-mc {
+    font-size:14px;
+}
+#msg-div {
+    position:absolute;
+    /*left:35%;*/
+    top:10px;
+    width:250px;
+    z-index:20000;
+}
+
+/*!
+ * Ext JS Library 3.2.1
+ * Copyright(c) 2006-2010 Ext JS, Inc.
+ * licensing@extjs.com
+ * http://www.extjs.com/license
+ */
+.x-portal .x-panel-dd-spacer {
+    margin-bottom:10px;
+}
+
+.x-portlet {
+    margin-bottom:10px;
+}
+
+/* Clean up the look of the portlets */
+.x-portlet .x-panel-ml {
+    padding-left:2px;
+}
+.x-portlet .x-panel-mr {
+    padding-right:2px;
+}
+.x-portlet .x-panel-bl {
+    padding-left:2px;
+}
+
+.x-portlet .x-panel-br {
+    padding-right:2px;
+}
+.x-portlet .x-panel-body {
+    background:white;
+}
+.x-portlet .x-panel-mc {
+    padding-top:2px;
+}
+.x-portlet .x-panel-bc .x-panel-footer {
+    padding-bottom:2px;
+}
+.x-portlet .x-panel-nofooter .x-panel-bc {
+    height:2px;
+}
+
+/**
+  * message alert style 
+  */
+.msg .x-box-mc {
+    font-size:14px;
+}
+#msg-div {
+    position:absolute;
+    /*left:35%;*/
+    top:10px;
+    width:250px;
+    z-index:20000;
+}

@@ -1,0 +1,27 @@
+##<link rel="stylesheet" type="text/css" href="http://img0.zz91.com/lib/extjs/3.2/examples/ux/css/RowEditor.css" />
+##<script type="text/javascript" src="http://img0.zz91.com/lib/extjs/3.2/examples/ux/RowEditor.js"></script>
+<script type="text/javascript" src="#springUrl('/app/hr/attendanceAnalysis.js')"></script>
+<script type="text/javascript" >
+
+	Ext.onReady(function(){
+	
+		#if("$!{schedule}"!="")
+			SCHEDULE=$!{schedule};
+		#end
+	
+		var grid = new com.zz91.zzwork.hr.attendance.analysis.ViewGrid({
+			title:"每月10号前，数据仅供参考，10号以后若有出入请找HR核对！",
+			region:"center"
+		});
+		
+		grid.getStore().baseParams["name"]="$!{name}";
+		grid.getStore().reload({params:{"start":0, "limit":Context.PAGE_SIZE}});
+
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[grid]
+		});
+	});
+
+	
+</script>

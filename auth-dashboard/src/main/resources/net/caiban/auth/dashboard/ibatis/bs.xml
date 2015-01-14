@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="bs">
+	
+	<typeAlias alias="bs" type="net.caiban.auth.dashboard.domain.bs.Bs" />
+	<typeAlias alias="staff" type="net.caiban.auth.dashboard.domain.staff.Staff"/>
+	<typeAlias alias="dept" type="net.caiban.auth.dashboard.domain.staff.Dept"/>
+	<typeAlias alias="staffDto" type="net.caiban.auth.dashboard.dto.staff.StaffDto" />
+	
+	<sql id="fullColumnStaff">
+		st.id,
+		st.account,
+		st.st_no,
+		st.dept_code,
+		st.name,
+		st.email,
+		st.sex,
+		st.avatar,
+		st.birthday,
+		st.jobs,
+		st.status,
+		st.gmt_entry,
+		st.gmt_left,
+		st.note,
+		st.gmt_created,
+		st.gmt_modified
+	</sql>
+	
+	<resultMap class="staffDto" id="staffDtoResult">
+		<result property="staff" resultMap="bs.staffResult" />
+		<result property="deptName" column="deptName" />
+		<result property="bsId" column="bsId" />
+	</resultMap>
+	
+	<resultMap class="staff" id="staffResult">
+		<result property="id" column="id" />
+		<result property="account" column="account"/>
+		<result property="staffNo" column="staff_no"/>
+		<result property="deptCode" column="dept_code"/>
+		<result property="name" column="name" />
+		<result property="email" column="email"/>
+		<result property="sex" column="sex" />
+		<result property="avatar" column="avatar" />
+		<result property="birthday" column="birthday" />
+		<result property="jobs" column="jobs" />
+		<result property="status" column="status" />
+		<result property="gmtEntry" column="gmt_entry" />
+		<result property="gmtLeft" column="gmt_left" />
+		<result property="note" column="note" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<sql id="fullColumnDept">
+		d.id,
+		d.name,
+		d.code,
+		d.note,
+		d.gmt_created,
+		d.gmt_modified
+	</sql>
+	
+	<resultMap  class="dept" id="deptResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="code" column="code" />
+		<result property="note" column="note" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<sql id="fullColumn" >
+		b.id,
+		b.code,
+		b.password,
+		b.name,
+		b.right_code,
+		b.url,
+		b.avatar,
+		b.note,
+		b.types,
+		b.versions,
+		b.gmt_created,
+		b.gmt_modified
+	</sql>
+	
+	<resultMap class="bs" id="bsResult">
+		<result property="id" column="id" />
+		<result property="code" column="code" />	
+		<result property="password" column="password" />
+		<result property="name" column="name" />
+		<result property="rightCode" column="right_code" />
+		<result property="url" column="url" />
+		<result property="avatar" column="avatar" />
+		<result property="note" column="note" />
+		<result property="types" column="types" />
+		<result property="versions" column="versions" />
+		<result property="gmtCreated" column="gmt_created" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+	
+	<select id="countBsOfDept" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		select count(*)
+		from bs_dept bd
+		<dynamic>
+			<isNotEmpty property="code">
+				inner join bs b 
+				on bd.bs_id=b.id
+			</isNotEmpty>
+		</dynamic>
+		where bd.dept_id=#deptId#
+		<dynamic prepend="and">
+			<isNotEmpty property="code">
+				b.code=#code#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="countBsOfStaff" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		select count(*)
+		from bs_staff bf
+		<dynamic>
+			<isNotEmpty property="code">
+				inner join bs b 
+				on bf.bs_id=b.id
+			</isNotEmpty>
+		</dynamic>
+		where bf.staff_id=#staffId#
+		<dynamic prepend="and">
+			<isNotEmpty property="code">
+				b.code=#code#
+        	</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryBsOfDept" parameterClass="java.util.HashMap" 
+		resultMap="bsResult">
+		select
+		<include refid="bs.fullColumn"/>
+		from bs b 
+		inner join bs_dept bd on b.id=bd.bs_id
+		where bd.dept_id=#deptId#
+		<dynamic>
+			<isNotEmpty prepend="and" property="types">
+				b.types=#types#
+			</isNotEmpty>
+		</dynamic>
+	  	limit 500
+	</select>
+	
+	<select id="queryBsOfStaff" parameterClass="java.util.HashMap" 
+		resultMap="bsResult">
+	  	select 
+	  	<include refid="bs.fullColumn"/>
+		from bs b
+		inner join bs_staff bf on b.id=bf.bs_id
+		where bf.staff_id=#staffId#
+	  	<dynamic>
+		  	<isNotEmpty prepend="and" property="types">
+		  		b.types=#types#
+		  	</isNotEmpty>
+	  	</dynamic>
+	  	limit 500
+	</select>
+    
+    <select id="queryRightCodeOfBs" parameterClass="java.lang.String" resultClass="java.lang.String">
+	    select 
+	    b.right_code 
+	    from bs b 
+	    where b.code=#value#
+    </select>
+    
+    <select id="queryPasswordOfBs" parameterClass="java.lang.String" resultClass="java.lang.String">
+    	select password from bs where code=#value#
+    </select>
+    
+	<insert id="insertBs" parameterClass="bs">
+		insert into `bs`
+		(
+		`code`,
+		`password`,
+		`name`,
+		`right_code`,
+		`url`,
+		`avatar`,
+		`note`,
+		`types`,
+		`versions`,
+		`gmt_created`,
+		`gmt_modified`)
+		values
+		(
+		#code#,
+		#password#,
+		#name#,
+		#rightCode#,
+		#url#,
+		#avatar#,
+		#note#,
+		#types#,
+		#versions#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteBs" parameterClass="java.lang.Integer">
+		delete from bs where id=#id#
+	</delete>
+	
+	<sql id="dynmicBs">
+		<dynamic prepend="where">
+			<isNotEmpty property="bs.code" prepend="and">
+			 	b.code=#bs.code#
+			</isNotEmpty>
+			<isNotEmpty property="bs.name" prepend="and">
+			 	b.name like concat('%',#bs.name#,'%')
+			</isNotEmpty>
+			<isNotEmpty property="bs.types" prepend="and">
+			 	b.types=#bs.types#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="queryBs" parameterClass="java.util.HashMap" resultMap="bsResult">
+		select
+		<include refid="bs.fullColumn"/>
+		from bs b
+		<include refid="bs.dynmicBs"/>
+		<include refid="common.pageOrderBy" />
+		<include refid="common.pageLimit" />
+	</select>
+
+	<select id="queryBsCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		select count(*) from bs b
+		<include refid="bs.dynmicBs"/>
+	</select>
+	
+	<select id="queryOneBs" parameterClass="java.lang.Integer" resultMap="bsResult">
+		select 
+		<include refid="bs.fullColumn"/>
+		from bs b where id=#value#
+	</select>
+	
+	<update id="updateBs" parameterClass="bs">
+		update `bs`
+		set
+		`code` = #code#,
+		`password` = #password#,
+		`name` = #name#,
+		`right_code` = #rightCode#,
+		`url` = #url#,
+		`avatar` = #avatar#,
+		`note` = #note#,
+		`types` = #types#,
+		`versions` = #versions#,
+	    `gmt_modified` = now()
+		where id=#id#
+	</update>
+	
+	<select id="queryStaffByBs" parameterClass="java.util.HashMap" resultMap="staffResult">
+		select 
+        <include refid="bs.fullColumnStaff"/> 
+		from staff st
+		inner join bs_staff bstaff on bstaff.staff_id=st.id
+		where bstaff.bs_id=#value#
+		<dynamic>
+			<isNotEmpty prepend="and" property="types">
+				b.types=#types#
+			</isNotEmpty>
+		</dynamic>
+		limit 500
+	</select>
+	
+	<select id="queryDeptByBs" parameterClass="java.util.HashMap" resultMap="deptResult">
+		select 
+		<include refid="bs.fullColumnDept"/>
+		from dept d
+		inner join bs_dept bd on d.id=bd.dept_id
+		where bd.bs_id=#id#
+		<dynamic>
+			<isNotEmpty prepend="and" property="types">
+				b.types=#types#
+			</isNotEmpty>		
+		</dynamic>
+	</select>
+	
+	<select id="queryDeptIdByBsId" parameterClass="java.lang.Integer" resultClass="java.lang.Integer" >
+		select dept_id from bs_dept
+		where bs_id=#value#;
+	</select>
+	
+	<select id="queryBsStaff" parameterClass="java.lang.Integer" resultMap="staffDtoResult">
+		select 
+			sf.id,
+			sf.account,
+			sf.staff_no,
+			sf.dept_code,
+			sf.name,
+			sf.email,
+			sf.sex,
+			sf.avatar,
+			sf.birthday,
+			sf.jobs,
+			sf.status,
+			sf.gmt_entry,
+			sf.gmt_left,
+			sf.note,
+			sf.gmt_created,
+			sf.gmt_modified,
+			d.name as deptName,
+			bstaff.bs_id as bsId
+		from bs_staff bstaff
+		inner join staff sf on bstaff.staff_id=sf.id
+		inner join dept d on sf.dept_code = d.code
+		where bstaff.bs_id=#value#
+	</select>
+	
+	<insert id="insertBsStaff" parameterClass="java.util.HashMap" >
+		insert into bs_staff(bs_id, staff_id)
+		values(#bsId#, #staffId#)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteBsStaff" parameterClass="java.util.HashMap" >
+		delete from bs_staff
+		where bs_id=#bsId# and staff_id=#staffId#
+	</delete>
+	
+	<delete id="deleteBsDept" parameterClass="java.util.HashMap">
+		delete from bs_dept
+		where bs_id=#bsId# and dept_id=#deptId#
+	</delete>
+	
+	<insert id="insertBsDept" parameterClass="java.util.HashMap" >
+		insert into bs_dept(bs_id, dept_id)
+		values(#bsId#, #deptId#)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<delete id="deleteBsDeptByBsId" parameterClass="java.lang.Integer">
+		delete from bs_dept where bs_id=#value#
+	</delete>
+	
+	<delete id="deleteBsStaffByBsId" parameterClass="java.lang.Integer">
+		delete from bs_staff where bs_id=#value#
+	</delete>
+	
+	<select id="queryUrl" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select url from bs where keys=#value#
+	</select>
+</sqlMap>

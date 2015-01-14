@@ -1,0 +1,47 @@
+<script type="text/javascript" src="#springUrl('/app/auth/role.js')" ></script>
+<script type="text/javascript" src="#springUrl('/app/auth/rightTree.js')" ></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		var right=new com.zz91.zzwork.auth.right.Tree({
+			id: ROLE.RIGHTTREE,
+			layout:"fit",
+			nodeUrl:Context.ROOT+"/auth/role/rigthChild.htm",
+			region:"center",
+		});
+		
+		var role=new com.zz91.zzwork.auth.role.RoleEditGrid({
+			region:"west",
+			layout:"fit",
+			width:300
+		});
+		
+		right.getRootNode().expand();
+		
+		right.getLoader().on("beforeload",function(treeLoader,node){
+			this.baseParams["parentCode"]=node.attributes["data"];
+			var r=role.getSelectionModel().getSelected();
+			if(typeof(r)!="undefined"){
+				this.baseParams["roleId"]=r.get("id");
+			}
+		});
+		
+		right.on("checkchange",function(node, checked){
+			var r=role.getSelectionModel().getSelected();
+			if(typeof(r)!="undefined"){
+    			com.zz91.zzwork.auth.role.UpdateRoleRight(r.get("id"), node.attributes["id"], checked);
+			}
+		});
+		
+		role.on("rowclick",function(grid,rowIndex,e){
+			right.getLoader().load(right.getRootNode());
+			if(!right.getRootNode().isExpanded()){
+    			right.getRootNode().expand();
+			}
+		});
+		
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:[role,right]
+		});
+	})
+</script>

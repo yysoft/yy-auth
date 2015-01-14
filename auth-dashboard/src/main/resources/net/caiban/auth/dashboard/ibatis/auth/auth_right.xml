@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="authRight">
+	
+	<typeAlias alias="right" type="net.caiban.auth.dashboard.domain.auth.AuthRight"/>
+
+	<sql id="fullColumn" >
+		ar.`id`,
+		ar.`code`,
+		ar.`name`,
+		ar.`sort`,
+		ar.`content`,
+		ar.`menu`,
+		ar.`menu_url`,
+		ar.`menu_css`,
+		ar.`gmt_created`,
+		ar.`gmt_modified`
+	</sql>
+
+	<resultMap id="rightResult" class="right">
+		<result property="id" column="id" />
+		<result property="code" column="code"/>
+		<result property="name" column="name"/>
+		<result property="content" column="content"/>
+		<result property="menu" column="menu"/>
+		<result property="menuUrl" column="menu_url"/>
+		<result property="menuCss" column="menu_css"/>
+		<result property="gmtCreated" column="gmt_created"/>
+		<result property="gmtModified" column="gmt_modified"/>
+	</resultMap>
+
+	<select id="countChild" parameterClass="java.lang.String" resultClass="java.lang.Integer" >
+		select count(*) from auth_right where code like concat(#value#,'_%');
+	</select>
+	
+	<select id="queryChild" parameterClass="java.lang.String" resultMap="rightResult" >
+		select 
+			<include refid="authRight.fullColumn" />
+		from auth_right ar
+		where code like concat(#value#,'____')
+		order by sort asc, code asc
+	</select>
+	
+	<delete id="deleteRightByCode" parameterClass="java.lang.String" >
+		delete from auth_right where code like concat(#value#,'%')
+	</delete>
+	
+	<select id="queryOneRight" parameterClass="java.lang.String" resultMap="rightResult" >
+		select 
+			<include refid="authRight.fullColumn" />
+		from auth_right ar
+		where code = #value#
+		limit 1
+	</select>
+	
+	<select id="queryMaxCodeOfChild" parameterClass="java.lang.String" resultClass="java.lang.String" >
+		select max(code) from auth_right
+		where code like concat(#value#,'____')
+	</select>
+	
+	<insert id="insertRight" parameterClass="right" >
+		
+		insert into `auth_right`
+		(
+		`code`,
+		`name`,
+		`sort`,
+		`content`,
+		`menu`,
+		`menu_url`,
+		`menu_css`,
+		`gmt_created`,
+		`gmt_modified`)
+		values
+		(
+		#code#,
+		#name#,
+		#sort#,
+		#content#,
+		#menu#,
+		#menuUrl#,
+		#menuCss#,
+		now(),
+		now()
+		)
+		<selectKey keyProperty="id" resultClass="java.lang.Integer">
+			select last_insert_id()
+		</selectKey>
+	</insert>
+	
+	<update id="updateRight" parameterClass="right" >
+		update `auth_right`
+		set
+		`name` = #name#,
+		`sort` = #sort#,
+		`content` = #content#,
+		`menu` = #menu#,
+		`menu_url` = #menuUrl#,
+		`menu_css` = #menuCss#,
+		`gmt_modified` = now()
+		where id=#id#
+	</update>
+	
+	<delete id="deleteDeptRight" parameterClass="java.lang.String">
+		delete from dept_right 
+		where auth_right_id in
+		(select r.id from auth_right r where r.code like concat(#value#,'%') )
+	</delete>
+	
+	<delete id="deleteRoleRight" parameterClass="java.lang.String">
+		delete from auth_role_right where right_id in 
+		(select r.id from auth_right r where r.code like concat(#value#,'%'))
+	</delete>
+	
+	<select id="queryIdByCode"  parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select id from auth_right where code = #value#;
+	</select>
+	
+	<select id="queryNameByCode" parameterClass="java.lang.String" resultClass="java.lang.String">
+		select name from auth_right
+		where code=#value#
+		limit 1
+	</select>
+	
+</sqlMap>

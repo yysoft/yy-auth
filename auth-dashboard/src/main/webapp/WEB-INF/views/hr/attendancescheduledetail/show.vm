@@ -1,0 +1,114 @@
+<style >
+div {margin-top:10px;}
+div table {line-height:24px;}
+</style>
+
+<script type="text/javascript">
+	
+	function resetWorkf (){
+		var workf=Ext.query("#targetWorkf")[0].value;
+		Ext.each(Ext.query(".cssworkf"),function(item,idx,allItems){
+			item.value=workf;
+		});
+	}
+	
+	function resetWorkt (){
+		var workt=Ext.query("#targetWorkt")[0].value;
+		Ext.each(Ext.query(".cssworkt"),function(item,idx,allItems){
+			item.value=workt;
+		});
+	}
+	
+	function submitForm(){
+		var dayArr=new Array();
+		var workfArr=new Array();
+		var worktArr=new Array();
+		
+		Ext.each(Ext.query(".chk"),function(item,idx,allItems){
+			if(item.checked){
+				dayArr.push(item.value);
+				workfArr.push(Ext.query("#workf-"+item.value)[0].value);
+				worktArr.push(Ext.query("#workt-"+item.value)[0].value);
+			}
+		});
+		
+		Ext.query("#dayArr")[0].value=dayArr.join(",");
+		Ext.query("#workfArr")[0].value=workfArr.join(",");
+		Ext.query("#worktArr")[0].value=worktArr.join(",");
+		
+		return true;
+	}
+</script>
+
+<div style="padding:20px;">
+    <form action="#springUrl('/hr/attendancescheduledetail/saveDetail.htm')" method="post" onsubmit="return submitForm();">  
+		
+		<input type="hidden" name="dayArr" id="dayArr" value="" />
+		<input type="hidden" name="workfArr" id="workfArr" value=""/>
+		<input type="hidden" name="worktArr" id="worktArr" value=""/>
+		<input type="hidden" name="scheduleId" value="$!{scheduleId}"/>
+		<input type="hidden" name="targetMonth" value="$!{targetMonth}"/>
+        
+		<div style="font-weight:bold;">
+        	班次：$!{scheduleName}
+			<br />
+			#set($mr=$!{month} +1)
+			时间：$!{year}年$!{mr}月
+        </div>
+		
+		<div >
+            上班时间：<input name="targetWorkf" id="targetWorkf" value="$!{workf}" onblur="resetWorkf();"></input>
+			下班时间：<input name="targetWorkt" id="targetWorkt" value="$!{workt}" onblur="resetWorkt();"></input>
+        </div>
+        
+        <div>
+			<table>
+                <tr>
+					<th> </th>
+					<th width="40">日期</th>
+					<th width="60">星期</th>
+					<th>上班时间</th>
+					<th>下班时间</th>
+				</tr>
+            #foreach($md in $!{list})
+				<tr #if($!{md.detail.dayOfWeek} == 1 || $!{md.detail.dayOfWeek} == 7) style="background-color:#ccc;" #end >
+					<td>
+						##如果新的按照正常周末来
+						##如果是已经有数据的，按照输出来
+						#if("$!{action}"=="update")
+							#if("$!{md.workDay}"=="1")
+								<input type="checkbox" name="chk"  value="$!{md.detail.dayOfMonth}" class="chk" checked />
+							#else
+								<input type="checkbox" name="chk"  value="$!{md.detail.dayOfMonth}" class="chk" />
+							#end
+						#else
+    						#if($!{md.detail.dayOfWeek} == 1 || $!{md.detail.dayOfWeek} == 7)
+    							<input type="checkbox" name="chk" value="$!{md.detail.dayOfMonth}" class="chk" />
+    						#else
+    							<input type="checkbox" name="chk"  value="$!{md.detail.dayOfMonth}" class="chk" checked />
+    						#end
+						#end
+					</td>
+					<td>$!{md.detail.dayOfMonth}日</td>
+					<td>
+						#foreach($week in $!{weekName})
+							#if($velocityCount == $!{md.detail.dayOfWeek})
+								$week
+							#end
+						#end
+					</td>
+                    <td><input type="text" value="$!{md.workf}" class="cssworkf" name="workf" id="workf-$!{md.detail.dayOfMonth}"/></td>
+                    <td><input type="text" value="$!{md.workt}" class="cssworkt" name="workt" id="workt-$!{md.detail.dayOfMonth}"/></td>
+				</tr>
+			#end
+			</table>
+				
+        </div>
+        
+        <div>
+        <input type="submit" value="确认所填信息无误，保存排班信息" style="width:200px;height:24px;" />
+        </div>
+    
+    </form>
+</div>
+	

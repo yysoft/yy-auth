@@ -1,0 +1,17 @@
+<script type="text/javascript" src="#springUrl('/app/hr/attCountResult.js')"></script>
+<script type="text/javascript" >
+	Ext.onReady(function(){
+		var attCountTab = new com.zz91.zzwork.hr.AttCountTable({
+			region:"center",
+			split:true,
+			height:350
+		});
+		var viewport = new Ext.Viewport({
+			layout:"border",
+			items:
+			[attCountTab]
+		});
+	});
+
+	
+</script>
