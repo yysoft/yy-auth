@@ -14,8 +14,6 @@ import net.caiban.auth.dashboard.domain.staff.Dept;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.Assert;
-
 @Component("deptDao")
 public class DeptDaoImpl extends BaseDao implements DeptDao {
 
@@ -27,7 +25,7 @@ public class DeptDaoImpl extends BaseDao implements DeptDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Dept> queryChild(String parentCode) {
-		Assert.notNull(parentCode,  messageSource.getMessage("assert.notnull", new String[] { "parentCode" }, null));
+//		Assert.notNull(parentCode,  messageSource.getMessage("assert.notnull", new String[] { "parentCode" }, null));
 		return getSqlMapClientTemplate().queryForList(buildId(SQL_PREFIX, "queryChild"),parentCode);
 	}
 

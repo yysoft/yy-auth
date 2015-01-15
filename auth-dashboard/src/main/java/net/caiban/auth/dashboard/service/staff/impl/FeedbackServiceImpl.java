@@ -15,8 +15,6 @@ import net.caiban.auth.dashboard.service.staff.FeedbackService;
 
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.Assert;
-
 /**
  * @author mays (mays@zz91.com)
  *
@@ -30,25 +28,25 @@ public class FeedbackServiceImpl implements FeedbackService {
 	
 	@Override
 	public Integer dealImpossible(Integer id) {
-		Assert.notNull(id, "the id can not be null");
+//		Assert.notNull(id, "the id can not be null");
 		return feedbackDao.updateStatus(id, FeedbackDao.STATUS_IMPOSSIBLE);
 	}
 
 	@Override
 	public Integer dealNothing(Integer id) {
-		Assert.notNull(id, "the id can not be null");
+//		Assert.notNull(id, "the id can not be null");
 		return feedbackDao.updateStatus(id, FeedbackDao.STATUS_NOTHING);
 	}
 
 	@Override
 	public Integer dealSuccess(Integer id) {
-		Assert.notNull(id, "the id can not be null");
+//		Assert.notNull(id, "the id can not be null");
 		return feedbackDao.updateStatus(id, FeedbackDao.STATUS_SUCCESS);
 	}
 
 	@Override
 	public Integer deleteFeedback(Integer id) {
-		Assert.notNull(id, "the id can not be null");
+//		Assert.notNull(id, "the id can not be null");
 		return feedbackDao.deleteFeedback(id);
 	}
 

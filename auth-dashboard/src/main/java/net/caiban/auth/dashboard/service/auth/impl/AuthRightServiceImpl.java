@@ -17,7 +17,7 @@ import net.caiban.auth.dashboard.service.auth.AuthRightService;
 
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@zz91.com)
@@ -54,7 +54,7 @@ public class AuthRightServiceImpl implements AuthRightService {
 
 	@Override
 	public Integer deleteRightByCode(String code) {
-		if(StringUtils.isEmpty(code) || code.length()<=0){
+		if(Strings.isNullOrEmpty(code) || code.length()<=0){
 			return null;
 		}
 		

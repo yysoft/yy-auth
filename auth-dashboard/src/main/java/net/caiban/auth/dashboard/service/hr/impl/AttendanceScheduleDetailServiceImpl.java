@@ -18,10 +18,9 @@ import net.caiban.auth.dashboard.domain.hr.AttendanceScheduleDetail;
 import net.caiban.auth.dashboard.domain.hr.AttendanceScheduleDetailSearch;
 import net.caiban.auth.dashboard.dto.hr.AttendanceScheduleDetailDto;
 import net.caiban.auth.dashboard.service.hr.AttendanceScheduleDetailService;
+import net.caiban.utils.DateUtil;
 
 import org.springframework.stereotype.Component;
-
-import com.zz91.util.datetime.DateUtil;
 
 /**
  * @author mays

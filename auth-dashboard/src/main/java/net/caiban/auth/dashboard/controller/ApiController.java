@@ -19,15 +19,17 @@ import net.caiban.auth.dashboard.service.bs.BsService;
 import net.caiban.auth.dashboard.service.staff.StaffService;
 import net.caiban.auth.sdk.AuthMenu;
 import net.caiban.auth.sdk.SessionUser;
+import net.caiban.utils.MD5;
+import net.caiban.utils.cache.JedisUtil;
 import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zz91.util.cache.JedisClientUtils;
-import com.zz91.util.encrypt.MD5;
-import com.zz91.util.lang.StringUtils;
+import redis.clients.jedis.Jedis;
+
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@zz91.com)
@@ -50,7 +52,7 @@ public class ApiController extends BaseController {
 		do {
 			//验证用户登录信息是否正确
 			String account = staffService.validateUser(a, pd, pc);
-			if(StringUtils.isEmpty(account)){
+			if(Strings.isNullOrEmpty(account)){
 				break;
 			}
 			SessionUser sessionUser = staffService.initSessionUser(account, pc);
@@ -78,7 +80,19 @@ public class ApiController extends BaseController {
 			
 			//保存6小时
 //			MemcachedUtils.getInstance().getClient().set(ticket, 6*60*60, sessionUser);
-			JedisClientUtils.getInstance().getClient().setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
+			
+			Jedis jedis = null;
+			try {
+				jedis = JedisUtil.getJedis();
+				jedis.setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
+			} catch (Exception e) {
+			}finally{
+				if(jedis!=null){
+					JedisUtil.getPool().returnResource(jedis);
+				}
+			}
+			
+//			JedisClientUtils.getInstance().getClient().setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
 			
 		} while (false);
 		
@@ -91,10 +105,23 @@ public class ApiController extends BaseController {
 		//TODO 可以换成数据库方式实现
 //		SessionUser sessionUser = (SessionUser) MemcachedUtils.getInstance().getClient().get(t);
 		
-		String userStr = JedisClientUtils.getInstance().getClient().get(t);
+		Jedis jedis = null;
+		
+		String userStr = null;
+				
+		try {
+			jedis = JedisUtil.getJedis();
+			userStr = jedis.get(t);
+		} catch (Exception e) {
+		}finally{
+			if(jedis!=null){
+				JedisUtil.getPool().returnResource(jedis);
+			}
+		}
 		
 		do {
-			if(StringUtils.isEmpty(userStr)){
+			
+			if(Strings.isNullOrEmpty(userStr)){
 				break;
 			}
 			
@@ -126,7 +153,7 @@ public class ApiController extends BaseController {
 	
 	@RequestMapping
 	public ModelAndView menu(HttpServletRequest request, Map<String, Object> out, String parentCode, String projectCode, String account){
-		if(StringUtils.isEmpty(parentCode)){
+		if(Strings.isNullOrEmpty(parentCode)){
 			parentCode = bsService.queryRightCodeOfProject(projectCode);
 		}
 		List<AuthMenu> menu = staffService.queryMenuOfStaff(account, parentCode);

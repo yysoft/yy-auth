@@ -31,12 +31,13 @@ import net.caiban.auth.dashboard.dto.staff.StaffDto;
 import net.caiban.auth.dashboard.service.staff.StaffService;
 import net.caiban.auth.sdk.AuthMenu;
 import net.caiban.auth.sdk.SessionUser;
+import net.caiban.utils.MD5;
+import net.caiban.utils.lang.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.encrypt.MD5;
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author root
@@ -98,7 +99,7 @@ public class StaffServiceImpl implements StaffService {
 	public SessionUser initSessionUser(String account, String projectCode) {
 		SessionUser sessionUser = null;
 		do {
-			if(StringUtils.isEmpty(account) || StringUtils.isEmpty(projectCode)){
+			if(Strings.isNullOrEmpty(account) || Strings.isNullOrEmpty(projectCode)){
 				break;
 			}
 			
@@ -144,12 +145,12 @@ public class StaffServiceImpl implements StaffService {
 		//取并集->array
 		Set<String> set = new HashSet<String>();
 		for(AuthRight right:deptRight) {
-			if(StringUtils.isNotEmpty(right.getContent())){
+			if(!Strings.isNullOrEmpty(right.getContent())){
 				CollectionUtils.addAll(set, right.getContent().split("\\|"));
 			}
 		}
 		for(AuthRight right:roleRight){
-			if(StringUtils.isNotEmpty(right.getContent())){
+			if(!Strings.isNullOrEmpty(right.getContent())){
 				CollectionUtils.addAll(set, right.getContent().split("\\|"));
 			}
 		}
@@ -172,7 +173,7 @@ public class StaffServiceImpl implements StaffService {
 	public String validateUser(String account, String password,
 			String projectCode) {
 		do {
-			if(StringUtils.isEmpty(account) || StringUtils.isEmpty(password)){
+			if(Strings.isNullOrEmpty(account) || Strings.isNullOrEmpty(password)){
 				break;
 			}
 			Integer[] status={0,1};  //0：试用期，1：转正，2：离职
@@ -223,7 +224,7 @@ public class StaffServiceImpl implements StaffService {
 		List<AuthMenu> menuList = new ArrayList<AuthMenu>();
 		for(Integer key:rightMap.keySet()){
 			AuthRight right = rightMap.get(key);
-			if(StringUtils.isNotEmpty(right.getMenu())){
+			if(!Strings.isNullOrEmpty(right.getMenu())){
 				AuthMenu menu = new AuthMenu();
 				menu.setData(right.getCode());
 				menu.setText(right.getMenu());
@@ -241,7 +242,7 @@ public class StaffServiceImpl implements StaffService {
 
 	@Override
 	public Integer updateStaff(Staff staff, String password, String roleArr) {
-		if(StringUtils.isNotEmpty(password)){
+		if(!Strings.isNullOrEmpty(password)){
 			try {
 				authUserDao.updatePassword(MD5.encode(password), staff.getAccount());
 			} catch (NoSuchAlgorithmException e) {
@@ -253,7 +254,7 @@ public class StaffServiceImpl implements StaffService {
 		
 		Integer userId=authUserDao.queryUserIdByAccount(staff.getAccount());
 		authUserDao.deleteUserRole(userId);
-		if(StringUtils.isNotEmpty(roleArr)){
+		if(!Strings.isNullOrEmpty(roleArr)){
 			authUserDao.insertUserRole(userId, StringUtils.StringToIntegerArray(roleArr));
 		}
 		
@@ -295,7 +296,7 @@ public class StaffServiceImpl implements StaffService {
 
 	@Override
 	public Integer changePassword(String account, String op, String np, String vp) {
-		if(StringUtils.isEmpty(op) || StringUtils.isEmpty(np)||StringUtils.isEmpty(vp) || !np.equals(vp)){
+		if(Strings.isNullOrEmpty(op) || Strings.isNullOrEmpty(np)||Strings.isNullOrEmpty(vp) || !np.equals(vp)){
 			return null;
 		}
 		try {
@@ -315,7 +316,7 @@ public class StaffServiceImpl implements StaffService {
 
 	@Override
 	public String queryNameOfAccount(String account) {
-		if(StringUtils.isEmpty(account)){
+		if(Strings.isNullOrEmpty(account)){
 			return "";
 		}
 		return staffDao.queryNameByAccount(account);
@@ -324,7 +325,7 @@ public class StaffServiceImpl implements StaffService {
 	@Override
 	public Map<String, String> queryStaffNameByDeptCode(String deptCode) {
 		Map<String, String> map=new HashMap<String, String>();
-		if(StringUtils.isEmpty(deptCode)){
+		if(Strings.isNullOrEmpty(deptCode)){
 			return map;
 		}
 		List<Staff> list=staffDao.queryStaffNameByDeptCode(deptCode);

@@ -11,10 +11,9 @@ import javax.annotation.Resource;
 
 import net.caiban.auth.dashboard.dao.auth.ParamDao;
 import net.caiban.auth.dashboard.service.auth.ParamService;
+import net.caiban.utils.param.Param;
 
 import org.springframework.stereotype.Component;
-
-import com.zz91.util.domain.Param;
 
 /**
  * @author mays (mays@zz91.com)

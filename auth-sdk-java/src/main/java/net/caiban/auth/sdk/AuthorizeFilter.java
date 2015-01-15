@@ -18,8 +18,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.zz91.util.http.HttpUtils;
-import com.zz91.util.lang.StringUtils;
+import net.caiban.utils.http.CookiesUtil;
+
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@zz91.com)
@@ -58,7 +59,7 @@ public class AuthorizeFilter implements Filter {
 			}
 			
 			SessionUser sessionUser = AuthClient.getInstance().getSessionUser(request, null);
-			String tickkey=HttpUtils.getInstance().getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
+			String tickkey=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
 			if(sessionUser == null || !tickkey.equals(sessionUser.getTicket())){
 //				sessionUser = AuthUtils.getInstance().validateTicket(request, projectCode, projectPassword);
 				sessionUser = AuthClient.getInstance().validateTicket(request, AuthConst.PROJECT_CODE, AuthConst.PROJECT_PASSWORD);
@@ -106,7 +107,7 @@ public class AuthorizeFilter implements Filter {
 		String tmp[]= null;
 		noLoginPage = new HashSet<String>();
 		String e1=config.getInitParameter("noLoginPage");
-		if(StringUtils.isNotEmpty(e1)){
+		if(!Strings.isNullOrEmpty(e1)){
 			tmp=e1.split("\\|");
 			for(String ex:tmp){
 				noLoginPage.add(ex);
@@ -115,7 +116,7 @@ public class AuthorizeFilter implements Filter {
 
 		noAuthPage = new HashSet<String>();
 		String e2=config.getInitParameter("noAuthPage");
-		if(StringUtils.isNotEmpty(e2)){
+		if(!Strings.isNullOrEmpty(e2)){
 			tmp=e2.split("\\|");
 			for(String ex:tmp){
 				noAuthPage.add(ex);

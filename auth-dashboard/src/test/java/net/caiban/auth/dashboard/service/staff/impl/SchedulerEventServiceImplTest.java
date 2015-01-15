@@ -11,10 +11,9 @@ import javax.annotation.Resource;
 import net.caiban.auth.dashboard.domain.staff.SchedulerEvent;
 import net.caiban.auth.dashboard.service.staff.schedulerEventService;
 import net.caiban.service.BaseServiceTestCase;
+import net.caiban.utils.DateUtil;
 
 import org.junit.Test;
-
-import com.zz91.util.datetime.DateUtil;
 
 
 public class SchedulerEventServiceImplTest extends BaseServiceTestCase{

@@ -19,15 +19,15 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.caiban.utils.MD5;
+import net.caiban.utils.http.CookiesUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.zz91.util.encrypt.MD5;
-import com.zz91.util.http.HttpUtils;
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@caiban.net)
@@ -59,7 +59,6 @@ public class AuthClient {
 	public SessionUser validateUser(HttpServletResponse response, String account, String password, String pcode, String ppassword){
 		SessionUser sessionUser = null;
 		
-	
 			try {
 				String encodePwd=MD5.encode(password);
 				//提交给服务器验证
@@ -68,7 +67,8 @@ public class AuthClient {
 				//验证返回结果是否正确
 				String key=doc.select("#key").val();
 				String ticket=doc.select("#ticket").val();
-				if(StringUtils.isEmpty(key) || StringUtils.isEmpty(ticket)){
+				
+				if(Strings.isNullOrEmpty(key) || Strings.isNullOrEmpty(ticket)){
 					return null;
 				}
 				
@@ -86,7 +86,7 @@ public class AuthClient {
 				String right = doc.select("#rightArr").val();
 				sessionUser.setRightArr(right.split("\\|"));
 
-				HttpUtils.getInstance().setCookie(response, AuthConst.TICKET_KEY, ticket, AuthConst.SSO_DOMAIN, null);
+				CookiesUtil.setCookie(response, AuthConst.TICKET_KEY, ticket, AuthConst.SSO_DOMAIN, null);
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NoSuchAlgorithmException e) {
@@ -104,8 +104,8 @@ public class AuthClient {
 	public SessionUser validateTicket(HttpServletRequest request, String pcode, String ppassword){
 		URL url;
 		SessionUser sessionUser = null;
-		String ticket=HttpUtils.getInstance().getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
-		if(StringUtils.isEmpty(ticket)){
+		String ticket=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
+		if(Strings.isNullOrEmpty(ticket)){
 			return null;
 		}
 		try {
@@ -113,7 +113,7 @@ public class AuthClient {
 			Document doc = Jsoup.parse(url, TIMEOUT);
 			String key = doc.select("#key").val();
 			String vticket = doc.select("#vticket").val();
-			if(StringUtils.isEmpty(key) || StringUtils.isEmpty(vticket)){
+			if(Strings.isNullOrEmpty(key) || Strings.isNullOrEmpty(vticket)){
 				return null;
 			}
 			//验证vticket
@@ -146,7 +146,7 @@ public class AuthClient {
 	
 	public void logout(HttpServletRequest request, HttpServletResponse response, String sessionid){
 		//得到票据，重置cookie
-		String ticket=HttpUtils.getInstance().getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
+		String ticket=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
 		URL url;
 		try {
 			url = new URL(AuthConst.API_HOST+"/ssoLogout.htm?t="+ticket);
@@ -157,7 +157,7 @@ public class AuthClient {
 			e.printStackTrace();
 		}
 		clearnSessionUser(request, sessionid);
-		HttpUtils.getInstance().setCookie(response, AuthConst.TICKET_KEY, null, AuthConst.SSO_DOMAIN, 0);
+		CookiesUtil.setCookie(response, AuthConst.TICKET_KEY, null, AuthConst.SSO_DOMAIN, 0);
 	}
 	
 	public String queryStaffNameOfAccount(String account){
@@ -235,7 +235,7 @@ public class AuthClient {
 	}
 	
 	public boolean authorizeRight(String rightContent, HttpServletRequest request, String sessionid){
-		if(StringUtils.isEmpty(rightContent)){
+		if(Strings.isNullOrEmpty(rightContent)){
 			return false;
 		}
 		
@@ -254,8 +254,8 @@ public class AuthClient {
 	}
 	
 	public SessionUser getSessionUser(HttpServletRequest request, String sessionid){
-		String tickkey=HttpUtils.getInstance().getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
-		if(StringUtils.isEmpty(tickkey)){
+		String tickkey=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
+		if(Strings.isNullOrEmpty(tickkey)){
 			clearnSessionUser(request, sessionid);
 			return null;
 		}

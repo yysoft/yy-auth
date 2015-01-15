@@ -21,13 +21,13 @@ import net.caiban.auth.dashboard.dto.ExtResult;
 import net.caiban.auth.dashboard.service.staff.schedulerEventService;
 import net.caiban.auth.sdk.AuthClient;
 import net.caiban.auth.sdk.SessionUser;
+import net.caiban.utils.DateUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zz91.util.datetime.DateUtil;
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@zz91.com)
@@ -58,10 +58,10 @@ public class EventController extends BaseController{
 		Date fromDate=null;
 		Date toDate=null;
 		try {
-			if (StringUtils.isNotEmpty(from)){
+			if (!Strings.isNullOrEmpty(from)){
 				fromDate = DateUtil.getDate(from, DATE_FORMATE);
 			}
-			if (StringUtils.isNotEmpty(to)){
+			if (!Strings.isNullOrEmpty(to)){
 				toDate = DateUtil.getDate(to, DATE_FORMATE);
 			}
 		} catch (ParseException e) {
@@ -117,7 +117,7 @@ public class EventController extends BaseController{
 			e.printStackTrace();
 		}
 		
-		if(StringUtils.isEmpty(event.getOwnerAccount())){
+		if(Strings.isNullOrEmpty(event.getOwnerAccount())){
 			event.setOwnerAccount(sessionUser.getAccount());
 		}
 		event.setDeptCode(sessionUser.getDeptCode());
@@ -142,7 +142,7 @@ public class EventController extends BaseController{
 		}
 		
 		event.setAssignAccount(sessionUser.getAccount());
-		if(StringUtils.isEmpty(event.getOwnerAccount())){
+		if(Strings.isNullOrEmpty(event.getOwnerAccount())){
 			event.setOwnerAccount(sessionUser.getAccount());
 		}
 		event.setDeptCode(sessionUser.getDeptCode());

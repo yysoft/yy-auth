@@ -25,7 +25,7 @@ import net.caiban.auth.dashboard.service.bs.BsService;
 
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author root
@@ -88,7 +88,7 @@ public class BsServiceImpl implements BsService {
 
 	@Override
 	public Integer createBs(Bs bs) {
-		if(StringUtils.isEmpty(bs.getAvatar())){
+		if(Strings.isNullOrEmpty(bs.getAvatar())){
 			bs.setAvatar("/themes/images/no_image.gif");
 		}
 		return bsDao.insertBs(bs);

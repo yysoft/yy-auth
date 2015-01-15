@@ -23,14 +23,12 @@ import net.caiban.auth.dashboard.dto.staff.StaffDto;
 import net.caiban.auth.dashboard.service.auth.AuthRoleService;
 import net.caiban.auth.dashboard.service.staff.StaffService;
 import net.caiban.auth.dashboard.util.DesktopConst;
+import net.caiban.utils.DateUtil;
+import net.caiban.utils.lang.StringUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.zz91.util.datetime.DateUtil;
-import com.zz91.util.lang.StringUtils;
-import com.zz91.util.mail.MailUtil;
 
 /**
  * @author mays (mays@zz91.com)
@@ -85,9 +83,9 @@ public class StaffController extends BaseController{
 			Map<String, Object> dataMap=new HashMap<String, Object>();
 			dataMap.put("staff", staff);
 			dataMap.put("pwd", password);
-			MailUtil.getInstance().sendMail(staff.getName()+"，您的工作平台账号开通啦，快来看一下吧！",
-					staff.getEmail(), null, null, "zz91",
-					"zzwork-staff", dataMap, MailUtil.PRIORITY_DEFAULT);
+//			MailUtil.getInstance().sendMail(staff.getName()+"，您的工作平台账号开通啦，快来看一下吧！",
+//					staff.getEmail(), null, null, "zz91",
+//					"zzwork-staff", dataMap, MailUtil.PRIORITY_DEFAULT);
 		}
 		
 		ExtResult result = new ExtResult();

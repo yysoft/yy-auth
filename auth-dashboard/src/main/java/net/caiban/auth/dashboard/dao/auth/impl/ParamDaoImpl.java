@@ -9,10 +9,9 @@ import java.util.List;
 
 import net.caiban.auth.dashboard.dao.BaseDao;
 import net.caiban.auth.dashboard.dao.auth.ParamDao;
+import net.caiban.utils.param.Param;
 
 import org.springframework.stereotype.Component;
-
-import com.zz91.util.domain.Param;
 
 /**
  * @author mays (mays@zz91.com)

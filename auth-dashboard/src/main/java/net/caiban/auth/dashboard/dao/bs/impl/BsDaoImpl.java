@@ -20,8 +20,6 @@ import net.caiban.auth.dashboard.dto.staff.StaffDto;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.Assert;
-
 /**
  * @author root
  * 
@@ -36,7 +34,7 @@ public class BsDaoImpl extends BaseDao implements BsDao {
 	
 	@Override
 	public Integer countBsOfDept(Integer deptId, String projectCode) {
-		Assert.notNull(deptId,  messageSource.getMessage("assert.notnull", new String[] { "deptId" }, null));
+//		Assert.notNull(deptId,  messageSource.getMessage("assert.notnull", new String[] { "deptId" }, null));
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("deptId", deptId);
 		root.put("code", projectCode);
@@ -45,7 +43,7 @@ public class BsDaoImpl extends BaseDao implements BsDao {
 
 	@Override
 	public Integer countBsOfStaff(Integer staffId, String projectCode) {
-		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
+//		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
 		Map<String,Object> root =new HashMap<String,Object>();
 		root.put("staffId", staffId);
 		root.put("code", projectCode);
@@ -55,7 +53,7 @@ public class BsDaoImpl extends BaseDao implements BsDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Bs> queryBsOfDept(Integer deptId, String types) {
-		Assert.notNull(deptId,  messageSource.getMessage("assert.notnull", new String[] { "deptId" }, null));
+//		Assert.notNull(deptId,  messageSource.getMessage("assert.notnull", new String[] { "deptId" }, null));
 		Map<String,Object> root=new HashMap<String,Object>();
 		root.put("deptId", deptId);
 		root.put("types",types);
@@ -65,7 +63,7 @@ public class BsDaoImpl extends BaseDao implements BsDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Bs> queryBsOfStaff(Integer staffId, String types) {
-		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
+//		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
 		Map<String,Object> root=new HashMap<String,Object>();
 		root.put("staffId", staffId);
 		root.put("types", types);
@@ -74,7 +72,7 @@ public class BsDaoImpl extends BaseDao implements BsDao {
 
 	@Override
 	public String queryRightCodeOfBs(String projectCode) {
-		Assert.notNull(projectCode,  messageSource.getMessage("assert.notnull", new String[] { "projectCode" }, null));
+//		Assert.notNull(projectCode,  messageSource.getMessage("assert.notnull", new String[] { "projectCode" }, null));
 		return (String)getSqlMapClientTemplate().queryForObject(buildId(SQL_PREFIX,"queryRightCodeOfBs"),projectCode);
 	}
 

@@ -15,14 +15,11 @@ import net.caiban.auth.dashboard.dto.hr.AttendanceScheduleDetailDto;
 import net.caiban.auth.dashboard.service.hr.AttendanceScheduleDetailService;
 import net.caiban.auth.dashboard.service.hr.AttendanceScheduleService;
 import net.caiban.auth.dashboard.util.DesktopConst;
-import net.caiban.auth.sdk.SessionUser;
+import net.caiban.utils.DateUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.zz91.util.datetime.DateUtil;
-import com.zz91.util.lang.StringUtils;
 
 @Controller
 public class AttendanceScheduleDetailController extends BaseController {
@@ -87,16 +84,17 @@ public class AttendanceScheduleDetailController extends BaseController {
 	}
 	
 
+	@Deprecated
 	@RequestMapping
 	public ModelAndView saveDetail(HttpServletRequest request, Map<String, Object> out, 
 			String dayArr, String workfArr, String worktArr,
 			Date targetMonth, Integer scheduleId) {
 		
-		SessionUser user=getCachedUser(request);
+//		SessionUser user=getCachedUser(request);
 		
-		attendanceScheduleDetailService.buildSchedule(scheduleId, targetMonth, 
-				StringUtils.StringToIntegerArray(dayArr), workfArr.split(","), 
-				worktArr.split(","), user.getAccount());
+//		attendanceScheduleDetailService.buildSchedule(scheduleId, targetMonth, 
+//				StringUtils.StringToIntegerArray(dayArr), workfArr.split(","), 
+//				worktArr.split(","), user.getAccount());
 		
 		
 		Calendar.getInstance().setTime(targetMonth);

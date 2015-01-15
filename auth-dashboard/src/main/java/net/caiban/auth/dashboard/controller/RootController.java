@@ -20,16 +20,16 @@ import net.caiban.auth.dashboard.dto.staff.StaffDto;
 import net.caiban.auth.dashboard.service.bs.BsService;
 import net.caiban.auth.dashboard.service.staff.FeedbackService;
 import net.caiban.auth.dashboard.service.staff.StaffService;
+import net.caiban.auth.sdk.AuthClient;
 import net.caiban.auth.sdk.AuthConst;
 import net.caiban.auth.sdk.AuthMenu;
-import net.caiban.auth.sdk.AuthClient;
 import net.caiban.auth.sdk.SessionUser;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * @author mays (mays@zz91.com)
@@ -66,7 +66,7 @@ public class RootController extends BaseController {
 	
 	@RequestMapping
 	public ModelAndView login(Map<String, Object> out, HttpServletRequest request, String go){
-		if(StringUtils.isNotEmpty(go)){
+		if(!Strings.isNullOrEmpty(go)){
 			out.put("gourl", bsService.queryUrl(go));
 		}
 		return null;

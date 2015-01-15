@@ -21,6 +21,7 @@ import net.caiban.auth.dashboard.service.hr.AttendanceScheduleDetailService;
 import net.caiban.auth.dashboard.service.hr.AttendanceScheduleService;
 import net.caiban.auth.dashboard.service.hr.AttendanceService;
 import net.caiban.auth.dashboard.util.DesktopConst;
+import net.caiban.utils.DateUtil;
 import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Controller;
@@ -29,8 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zz91.util.datetime.DateUtil;
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 @Controller
 public class AttendanceController extends BaseController {
@@ -90,11 +90,11 @@ public class AttendanceController extends BaseController {
 		
 		int error=0;
 		do {
-			if(StringUtils.isEmpty(from)){
+			if(Strings.isNullOrEmpty(from)){
 				error=1;
 				break;
 			}
-			if(StringUtils.isEmpty(to)){
+			if(Strings.isNullOrEmpty(to)){
 				error=1;
 				break;
 			}
@@ -140,7 +140,7 @@ public class AttendanceController extends BaseController {
 		
 		Date targetMonthDate=null;
 		try {
-			if(StringUtils.isNotEmpty(targetMonth)){
+			if(!Strings.isNullOrEmpty(targetMonth)){
 				targetMonthDate =  DateUtil.getDate(targetMonth, "yyyy-MM");
 			}else {
 				targetMonthDate = DateUtil.getDate(new Date(), "yyyy-MM");
@@ -206,7 +206,7 @@ public class AttendanceController extends BaseController {
 		
 		Date targetMonthDate=null;
 		try {
-			if(StringUtils.isNotEmpty(targetMonth)){
+			if(!Strings.isNullOrEmpty(targetMonth)){
 				targetMonthDate =  DateUtil.getDate(targetMonth, "yyyy-MM");
 			}else {
 				targetMonthDate = DateUtil.getDate(new Date(), "yyyy-MM");

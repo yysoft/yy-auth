@@ -28,14 +28,14 @@ import net.caiban.auth.dashboard.dto.hr.AttendanceDto;
 import net.caiban.auth.dashboard.dto.hr.WorkDay;
 import net.caiban.auth.dashboard.service.hr.AttendanceService;
 import net.caiban.auth.dashboard.util.DesktopConst;
+import net.caiban.utils.DateUtil;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.datetime.DateUtil;
-import com.zz91.util.lang.StringUtils;
+import com.google.common.base.Strings;
 
 @Component("attendanceService")
 public class AttendanceServiceImpl implements AttendanceService {
@@ -55,7 +55,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public Boolean impt(Date from, Date to, InputStream inputStream, 
 			String dateFormat, Integer scheduleId) {
 		
-		if(StringUtils.isEmpty(dateFormat)){
+		if(Strings.isNullOrEmpty(dateFormat)){
 			dateFormat="yyyy-MM";
 		}
 		
@@ -90,7 +90,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 				att.setScheduleId(scheduleId);
 				
 				String gmtwork=row.getCell(2).getRichStringCellValue().toString();
-				if(!StringUtils.isEmpty(gmtwork)){
+				if(!Strings.isNullOrEmpty(gmtwork)){
 					try {
 						att.setGmtWork(DateUtil.getDate(gmtwork, dateFormat));
 					} catch (ParseException e) {
@@ -98,7 +98,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 					}
 				}
 				
-				if(StringUtils.isNotEmpty(att.getName())){
+				if(!Strings.isNullOrEmpty(att.getName())){
 					if(accountMap.get(att.getName())==null){
 						String ac= staffDao.queryAccountByName(att.getName());
 						if(ac==null){

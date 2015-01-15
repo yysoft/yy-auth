@@ -7,7 +7,7 @@ package net.caiban.auth.dashboard.service.auth;
 
 import java.util.List;
 
-import com.zz91.util.domain.Param;
+import net.caiban.utils.param.Param;
 
 /**
  * @author mays (mays@zz91.com)

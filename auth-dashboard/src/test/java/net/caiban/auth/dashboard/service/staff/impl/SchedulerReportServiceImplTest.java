@@ -11,10 +11,9 @@ import net.caiban.auth.dashboard.domain.staff.SchedulerReport;
 import net.caiban.auth.dashboard.domain.staff.SchedulerReportEvent;
 import net.caiban.auth.dashboard.service.staff.schedulerReportService;
 import net.caiban.service.BaseServiceTestCase;
+import net.caiban.utils.DateUtil;
 
 import org.junit.Test;
-
-import com.zz91.util.datetime.DateUtil;
 
 
 public class SchedulerReportServiceImplTest extends BaseServiceTestCase{

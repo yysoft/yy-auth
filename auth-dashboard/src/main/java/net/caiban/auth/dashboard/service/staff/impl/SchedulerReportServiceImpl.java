@@ -9,8 +9,6 @@ import net.caiban.auth.dashboard.domain.staff.SchedulerReport;
 import net.caiban.auth.dashboard.service.staff.schedulerReportService;
 
 import org.springframework.stereotype.Component;
-
-import com.zz91.util.Assert;
 @Component("schedulerReportService")
 public class SchedulerReportServiceImpl implements schedulerReportService{
 	
@@ -19,8 +17,8 @@ public class SchedulerReportServiceImpl implements schedulerReportService{
 
 	@Override
 	public Integer associateEvent(Integer reportId, Integer eventId) {
-		Assert.notNull(reportId, "the reportId can not be null");
-		Assert.notNull(eventId, "the eventId can not be null");
+//		Assert.notNull(reportId, "the reportId can not be null");
+//		Assert.notNull(eventId, "the eventId can not be null");
 		return schedulerReportDao.insertReportEvent(reportId, eventId);
 	}
 
@@ -35,15 +33,15 @@ public class SchedulerReportServiceImpl implements schedulerReportService{
 	}
 	@Override
 	public SchedulerReport queryOneReport(Integer id) {
-		Assert.notNull(id, "the id can not be null");
+//		Assert.notNull(id, "the id can not be null");
 		return schedulerReportDao.queryOneReport(id);
 	}
 
 	@Override
 	public List<SchedulerReport> queryReport(String year, Integer week,
 			String account, String deptCode) {
-		Assert.notNull(year, "the year can not be null");
-		Assert.notNull(week, "the week can not be null");
+//		Assert.notNull(year, "the year can not be null");
+//		Assert.notNull(week, "the week can not be null");
 		return schedulerReportDao.queryReport(year, week, account, deptCode);
 	}
 

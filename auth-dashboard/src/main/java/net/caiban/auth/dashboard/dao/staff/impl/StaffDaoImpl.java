@@ -20,8 +20,6 @@ import net.caiban.auth.dashboard.dto.staff.StaffDto;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import com.zz91.util.Assert;
-
 /**
  * @author root
  *
@@ -36,8 +34,8 @@ public class StaffDaoImpl extends BaseDao implements StaffDao {
 	
 	@Override
 	public Integer countStaffByStatus(String account, Integer[] status) {
-		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
-		Assert.notNull(status,  messageSource.getMessage("assert.notnull", new String[] { "status" }, null));
+//		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
+//		Assert.notNull(status,  messageSource.getMessage("assert.notnull", new String[] { "status" }, null));
 		Map<String,Object> root=new HashMap<String,Object>();
 		root.put("account", account);
 		root.put("status", status);
@@ -61,7 +59,7 @@ public class StaffDaoImpl extends BaseDao implements StaffDao {
 
 	@Override
 	public Staff queryStaffByAccount(String account) {
-		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
+//		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
 		return (Staff)getSqlMapClientTemplate().queryForObject(buildId(SQL_PREFIX, "queryStaffByAccount"),account);
 	}
 
@@ -75,8 +73,8 @@ public class StaffDaoImpl extends BaseDao implements StaffDao {
 	@Override
 	public Integer updateStaffStatus(Integer staffId, Integer status,
 			String note, Date gmtLeft) {
-		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
-		Assert.notNull(status,  messageSource.getMessage("assert.notnull", new String[] { "status" }, null));
+//		Assert.notNull(staffId,  messageSource.getMessage("assert.notnull", new String[] { "staffId" }, null));
+//		Assert.notNull(status,  messageSource.getMessage("assert.notnull", new String[] { "status" }, null));
 		Map<String,Object> root=new HashMap<String,Object>();
 		root.put("id", staffId);
 		root.put("status", status);
@@ -87,7 +85,7 @@ public class StaffDaoImpl extends BaseDao implements StaffDao {
 
 	@Override
 	public Integer queryStaffIdByAccount(String account) {
-		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
+//		Assert.notNull(account,  messageSource.getMessage("assert.notnull", new String[] { "account" }, null));
 		return (Integer) getSqlMapClientTemplate().queryForObject(buildId(SQL_PREFIX, "queryStaffIdByAccount"), account);
 	}
 
