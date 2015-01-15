@@ -5,6 +5,8 @@
  */
 package net.caiban.auth.dashboard.init;
 
+import net.caiban.utils.cache.JedisUtil;
+
 
 /**
  * @author Mays (x03570227@gmail.com)
@@ -12,19 +14,13 @@ package net.caiban.auth.dashboard.init;
  */
 public class InitSystem {
 
-//	@Resource
-//	private ParamService paramService;
-	
 	public void startup(){
-//		List<Param> paramList = paramService.queryParam();
-//		ParamUtils.getInstance().init(paramList, null);
 		
-//		JedisClientUtils.getInstance().init();
-//		MemcachedUtils.getInstance().init();
+		JedisUtil.initPool("cache.properties");
 	}
 	
 	public void shutdown(){
-//		MemcachedUtils.getInstance().shutdownClient();
+		JedisUtil.getPool().destroy();
 	}
 
 }

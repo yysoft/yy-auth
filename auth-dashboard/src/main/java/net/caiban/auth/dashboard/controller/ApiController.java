@@ -83,7 +83,7 @@ public class ApiController extends BaseController {
 			
 			Jedis jedis = null;
 			try {
-				jedis = JedisUtil.getJedis();
+				jedis = JedisUtil.getPool().getResource();
 				jedis.setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
 			} catch (Exception e) {
 			}finally{
@@ -110,7 +110,7 @@ public class ApiController extends BaseController {
 		String userStr = null;
 				
 		try {
-			jedis = JedisUtil.getJedis();
+			jedis = JedisUtil.getPool().getResource();
 			userStr = jedis.get(t);
 		} catch (Exception e) {
 		}finally{
