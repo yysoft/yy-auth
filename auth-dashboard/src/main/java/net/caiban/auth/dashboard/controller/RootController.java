@@ -24,6 +24,7 @@ import net.caiban.auth.sdk.AuthClient;
 import net.caiban.auth.sdk.AuthConst;
 import net.caiban.auth.sdk.AuthMenu;
 import net.caiban.auth.sdk.SessionUser;
+import net.caiban.auth.sdk.YYAuthException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,8 +88,16 @@ public class RootController extends BaseController {
 	
 	@RequestMapping
 	public ModelAndView checkuser(Map<String, Object> out, HttpServletRequest request, HttpServletResponse response, String account, String password){
-		SessionUser sessionUser = AuthClient.getInstance().validateUser(response, account, password, AuthConst.PROJECT_CODE, AuthConst.PROJECT_PASSWORD);
+		SessionUser sessionUser=null;
 		ExtResult result = new ExtResult();
+		
+		try {
+			sessionUser = AuthClient.getInstance().validateUser(response, account, password, AuthConst.PROJECT_CODE, AuthConst.PROJECT_PASSWORD);
+		} catch (YYAuthException e) {
+			result.setData("用户名或者密码写错了，检查下大小写是否都正确了，再试一次吧 :)");
+			return printJson(result, out);
+		}
+		
 		if(sessionUser!=null){
 			setSessionUser(request, sessionUser);
 			result.setSuccess(true);

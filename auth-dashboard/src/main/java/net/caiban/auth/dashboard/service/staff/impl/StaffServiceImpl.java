@@ -28,6 +28,7 @@ import net.caiban.auth.dashboard.domain.staff.Dept;
 import net.caiban.auth.dashboard.domain.staff.Staff;
 import net.caiban.auth.dashboard.dto.PageDto;
 import net.caiban.auth.dashboard.dto.staff.StaffDto;
+import net.caiban.auth.dashboard.exception.ServiceException;
 import net.caiban.auth.dashboard.service.staff.StaffService;
 import net.caiban.auth.sdk.AuthMenu;
 import net.caiban.auth.sdk.SessionUser;
@@ -171,33 +172,33 @@ public class StaffServiceImpl implements StaffService {
 
 	@Override
 	public String validateUser(String account, String password,
-			String projectCode) {
-		do {
-			if(Strings.isNullOrEmpty(account) || Strings.isNullOrEmpty(password)){
-				break;
+			String projectCode) throws ServiceException {
+		
+			if(Strings.isNullOrEmpty(account)){
+				throw new ServiceException("EMPTY_ACCOUNT");
+			}
+			if(Strings.isNullOrEmpty(password)){
+				throw new ServiceException("EMPTY_PASSWORD");
 			}
 			Integer[] status={0,1};  //0：试用期，1：转正，2：离职
 			Integer sc = staffDao.countStaffByStatus(account, status);
 			if(sc==null || sc.intValue()<=0){
-				break;
+				throw new ServiceException("STATUS_UN_POSITIVE");
 			}
 			
 			Integer uc = authUserDao.countUser(account, password);
 			if(uc==null || uc.intValue()<=0){
-				break;
+				throw new ServiceException("UNKOWN_ACCOUNT_OR_PASSWORD");
 			}
 			
 			Integer bsc = bsDao.countBsOfStaff(staffDao.queryStaffIdByAccount(account), projectCode);
 			Integer bdc = bsDao.countBsOfDept(deptDao.queryDeptIdByAccount(account), projectCode);
 			
 			if(bsc==null || bdc==null || (bsc.intValue()+bdc.intValue())<=0){
-				break;
+				throw new ServiceException("NOT_AUTHORIZED");
 			}
 			
 			return account;
-			
-		} while (false);
-		return null;
 	}
 	
 	@Override

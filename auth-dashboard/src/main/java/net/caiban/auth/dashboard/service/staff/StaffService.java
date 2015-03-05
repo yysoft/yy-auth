@@ -11,6 +11,7 @@ import net.caiban.auth.dashboard.domain.bs.Bs;
 import net.caiban.auth.dashboard.domain.staff.Staff;
 import net.caiban.auth.dashboard.dto.PageDto;
 import net.caiban.auth.dashboard.dto.staff.StaffDto;
+import net.caiban.auth.dashboard.exception.ServiceException;
 import net.caiban.auth.sdk.AuthMenu;
 import net.caiban.auth.sdk.SessionUser;
 
@@ -61,7 +62,7 @@ public interface StaffService {
 	 * 验证用户登录 1.验证员工状态是否正常，status<2 2.验证账户密码是否正确 3.验证项目是否允许访问
 	 */
 	public String validateUser(String account, String password,
-			String projectCode);
+			String projectCode) throws ServiceException;
 
 	/**
 	 * 初始化二项信息： 1.员工基本信息(account, staffname, deptCode) 2.初始化对应项目的权限

@@ -17,7 +17,7 @@ public class AuthConst {
 	public static String API_HOST="http://auth.caiban.net/api";
 	public static String SSO_DOMAIN="caiban.net";
 
-	public final static String TICKET_KEY="authssoticketkey";
+	public final static String TICKET_KEY="_WLT";
 	
 	private String projectCode;
 	private String projectPassword;

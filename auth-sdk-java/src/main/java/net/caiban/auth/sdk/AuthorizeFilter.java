@@ -18,6 +18,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import net.caiban.utils.http.CookiesUtil;
 
 import com.google.common.base.Strings;
@@ -35,6 +37,8 @@ public class AuthorizeFilter implements Filter {
 	private Set<String> noLoginPage;
 	private Set<String> noAuthPage;
 
+	private final static Logger LOG= Logger.getLogger(AuthorizeFilter.class);
+	
 	@Override
 	public void destroy() {
 	}
@@ -59,15 +63,25 @@ public class AuthorizeFilter implements Filter {
 			}
 			
 			SessionUser sessionUser = AuthClient.getInstance().getSessionUser(request, null);
-			String tickkey=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
-			if(sessionUser == null || !tickkey.equals(sessionUser.getTicket())){
+			if(sessionUser == null){
 //				sessionUser = AuthUtils.getInstance().validateTicket(request, projectCode, projectPassword);
-				sessionUser = AuthClient.getInstance().validateTicket(request, AuthConst.PROJECT_CODE, AuthConst.PROJECT_PASSWORD);
+				try {
+					sessionUser = AuthClient.getInstance().validateTicket(request, AuthConst.PROJECT_CODE, AuthConst.PROJECT_PASSWORD);
+				} catch (YYAuthException e) {
+					LOG.error("Error validate ticket. ERROR CODE: "+e.getMessage());
+					break;
+				}
+				
 				if(sessionUser==null){
 					break;
 				}else{
 					AuthClient.getInstance().setSessionUser(request, sessionUser, null);
 				}
+			}
+			
+			String ticket=CookiesUtil.getCookie(request, AuthConst.TICKET_KEY, AuthConst.SSO_DOMAIN);
+			if(Strings.isNullOrEmpty(ticket) || !ticket.equals(sessionUser.getTicket())){
+				break;
 			}
 			
 			if(filterByConfig(noAuthPage, path, uri)){

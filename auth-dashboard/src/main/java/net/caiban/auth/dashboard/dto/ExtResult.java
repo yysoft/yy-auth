@@ -41,6 +41,9 @@ public class ExtResult implements Serializable{
 	 * @return the success
 	 */
 	public Boolean getSuccess() {
+		if(success==null){
+			success=false;
+		}
 		return success;
 	}
 

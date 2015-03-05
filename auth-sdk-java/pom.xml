@@ -43,6 +43,11 @@
 			<artifactId>yy-utils</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		
 		<!-- 
 		
 		

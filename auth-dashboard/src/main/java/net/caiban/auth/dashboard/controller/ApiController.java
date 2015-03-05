@@ -15,6 +15,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.caiban.auth.dashboard.dto.ExtResult;
+import net.caiban.auth.dashboard.exception.ServiceException;
 import net.caiban.auth.dashboard.service.bs.BsService;
 import net.caiban.auth.dashboard.service.staff.StaffService;
 import net.caiban.auth.sdk.AuthMenu;
@@ -44,23 +46,22 @@ public class ApiController extends BaseController {
 	@Resource
 	private BsService bsService;
 	
-
 	@RequestMapping
 	public ModelAndView ssoUser(HttpServletRequest request, HttpServletResponse response, 
 			Map<String, Object> out, String a, String pc, String pd){
+		ExtResult result = new ExtResult();
 		
 		do {
 			//验证用户登录信息是否正确
-			String account = staffService.validateUser(a, pd, pc);
-			if(Strings.isNullOrEmpty(account)){
+			String account=null;
+			try {
+				account = staffService.validateUser(a, pd, pc);
+			} catch (ServiceException e1) {
+				result.setData(e1.getMessage());
 				break;
 			}
+			
 			SessionUser sessionUser = staffService.initSessionUser(account, pc);
-
-//			//验证用户是否允许使用该系统
-//			if(!bsService.allowAccess(account, pc)){
-//				break;
-//			}
 			
 			//生成ticket
 			String key=UUID.randomUUID().toString();
@@ -69,14 +70,14 @@ public class ApiController extends BaseController {
 			try {
 				ticket = MD5.encode(a+pd+pc+ppassword+key);
 			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
+				result.setData("SERVER_EXCEPTION");
+				break;
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				result.setData("SERVER_EXCEPTION");
+				break;
 			}
 			sessionUser.setKey(key);
 			sessionUser.setTicket(ticket);
-			
-			out.put("user", sessionUser);
 			
 			//保存6小时
 //			MemcachedUtils.getInstance().getClient().set(ticket, 6*60*60, sessionUser);
@@ -86,17 +87,20 @@ public class ApiController extends BaseController {
 				jedis = JedisUtil.getPool().getResource();
 				jedis.setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
 			} catch (Exception e) {
+				result.setData("SERVER_EXCEPTION");
+				break;
 			}finally{
 				if(jedis!=null){
 					JedisUtil.getPool().returnResource(jedis);
 				}
 			}
+			result.setSuccess(true);
+			result.setData(sessionUser);
 			
-//			JedisClientUtils.getInstance().getClient().setex(ticket, 6*60*60, JSONObject.fromObject(sessionUser).toString());
-			
+			return printJson(result, out);
 		} while (false);
 		
-		return new ModelAndView("/api/ssoUser");
+		return printJson(result, out);
 	}
 	
 	@RequestMapping
@@ -105,29 +109,37 @@ public class ApiController extends BaseController {
 		//TODO 可以换成数据库方式实现
 //		SessionUser sessionUser = (SessionUser) MemcachedUtils.getInstance().getClient().get(t);
 		
-		Jedis jedis = null;
-		
-		String userStr = null;
-				
-		try {
-			jedis = JedisUtil.getPool().getResource();
-			userStr = jedis.get(t);
-		} catch (Exception e) {
-		}finally{
-			if(jedis!=null){
-				JedisUtil.getPool().returnResource(jedis);
-			}
-		}
+		ExtResult result = new ExtResult();
 		
 		do {
+			if(Strings.isNullOrEmpty(t)){
+				result.setData("UNEXCEPT_TICKET");
+				break;
+			}
+			
+			Jedis jedis = null;
+			String userStr = null;
+			try {
+				jedis = JedisUtil.getPool().getResource();
+				userStr = jedis.get(t);
+			} catch (Exception e) {
+				result.setData("SERVER_EXCEPTION");
+				break;
+			}finally{
+				if(jedis!=null){
+					JedisUtil.getPool().returnResource(jedis);
+				}
+			}
 			
 			if(Strings.isNullOrEmpty(userStr)){
+				result.setData("SESSION_TIMEOUT");
 				break;
 			}
 			
 			SessionUser sessionUser = (SessionUser) JSONObject.toBean(JSONObject.fromObject(userStr), SessionUser.class);
 			
 			if(sessionUser==null){
+				result.setData("SESSION_TIMEOUT");
 				break;
 			}
 			
@@ -137,18 +149,23 @@ public class ApiController extends BaseController {
 			try {
 				vticket = MD5.encode(pc+ppassword+key);
 			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
+				result.setData("SERVER_EXCEPTION");
+				break;
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				result.setData("SERVER_EXCEPTION");
+				break;
 			}
 			sessionUser.setVticket(vticket);
 			sessionUser.setKey(key);
 			
 			sessionUser.setRightArr(staffService.queryRightOfStaff(sessionUser.getAccount(), pc));
 			
-			out.put("user", sessionUser);
+			result.setSuccess(true);
+			result.setData(sessionUser);
+			return printJson(result, out);
 		} while (false);
-		return null;
+		
+		return printJson(result, out);
 	}
 	
 	@RequestMapping
@@ -169,7 +186,6 @@ public class ApiController extends BaseController {
 	
 	@RequestMapping
 	public ModelAndView nameOfAccount(HttpServletRequest request, Map<String, Object> out, String a){
-		
 		return printJson("{'"+a+"':'"+staffService.queryNameOfAccount(a)+"'}", out);
 	}
 	
