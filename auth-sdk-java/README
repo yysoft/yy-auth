@@ -1,29 +1,2 @@
 UPDATE
 
-2013-7-15 v2.0.6 mays
-1 更改SessionUser，增加staffNo属性，以获取员工工号
-2 增加 test 服务器配置
-
-2013-6-18 v2.0.5 kongsj
-1.添加获取文件大小的方法
-
-2013-6-18 v2.0.4 kongsj
-1.文件上传白名单添加pdf
-2.添加pdf转化为swf的util工具类 PdfToSwfUtils
-
-2013-5-3 v2.0.3 kongsj
-1.添加分词工具，使用ikAnalzyer分词工具
-2.发布分词工具
-
-2013-4-2 v2.0.2 kongsj mays
-1.在numberutil文件中，添加业务处理时，针对不同size传入判断的size的返回值
-2 更改 param sql 文件，将 param 表的字段 names 改为 name，与domain对象对应
-
-2013-1-28 v2.0.1 kongsj
-1.添加敏感词工具类
-2.添加测试memcache的配置web.properties
-3.修改敏感词工具类，优化代码，添加验证方法、更新缓存两个方法，增强验证过滤的功能
-4.为敏感词工具类增加接口，增加一个直接返回过滤结果的接口，参数上，可以自选过滤的符号，null则默认为"*",可以使用""
-5.添加敏感词工具类词库说明，敏感词库不得包含“+”符号
-
-History http://192.168.2.200:8090/x/kIAm
