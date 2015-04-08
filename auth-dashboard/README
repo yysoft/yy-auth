@@ -14,7 +14,7 @@ CREATE DATABASE `auth` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 > Import data from: ``/path/to/yy-auth/doc/auth_init_1.2.sql``
 
-Step 3: Compile and package.
+Step 3: Setup configuration, Compile and package.
 
 > Replace profile of ``jdbc.location`` to your defined path
 
@@ -43,9 +43,14 @@ jdbc.acquireIncrement=10
 
 > Setup redis config in ``/path/to/yy-auth/auth-dashboard/src/main/resources/production/cache.properties``
 
-> Compile and package: ``mvn clean package -Pproduction -Dmaven.test.skip``
+> Setup web.properties in ``/path/to/yy-auth/auth-dashboard/src/main/resources/production/web.properties``
 
-> 
+```properties
+work.api=http://127.0.0.1:8080/work/api
+work.domain=  #sso root domain
+```
+
+> Compile and package: ``mvn clean package -Pproduction -Dmaven.test.skip``
 
 
 ### Update history
