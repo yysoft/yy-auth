@@ -84,6 +84,8 @@ public class AuthorizeFilter implements Filter {
 				break;
 			}
 			
+			request.setAttribute("sessionUser", sessionUser);
+			
 			if(filterByConfig(noAuthPage, path, uri)){
 				chain.doFilter(request, response);
 				return ;
