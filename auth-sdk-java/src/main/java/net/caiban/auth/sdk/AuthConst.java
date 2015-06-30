@@ -5,12 +5,24 @@
  */
 package net.caiban.auth.sdk;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import net.caiban.utils.file.PropertiesUtil;
+
+import com.google.common.base.Strings;
+
 /**
  * @author mays (mays@caiban.net)
  *
  * created on 2015-1-14
  */
 public class AuthConst {
+	
+	final static Logger LOG = Logger.getLogger(AuthConst.class);
+	
 	public static String PROJECT_CODE="";
 	public static String PROJECT_PASSWORD="";
 
@@ -18,6 +30,8 @@ public class AuthConst {
 	public static String SSO_DOMAIN="caiban.net";
 
 	public final static String TICKET_KEY="_WLT";
+	
+	public static String CONFIG_DEFAULT="auth.properties";
 	
 	private String projectCode;
 	private String projectPassword;
@@ -29,6 +43,32 @@ public class AuthConst {
 		PROJECT_PASSWORD = projectPassword;
 		API_HOST = api;
 		SSO_DOMAIN = domain;
+	}
+	
+	public static void init(){
+		init(CONFIG_DEFAULT);
+	}
+	
+	public static void init(String properties){
+		if(Strings.isNullOrEmpty(properties)){
+			throw new IllegalArgumentException("Init auth sdk failure. properties can not be null");
+		}
+		
+		try {
+			Map<String, String> config = PropertiesUtil.read(properties, PropertiesUtil.CHARSET_UTF8);
+			init(config);
+		} catch (IOException e) {
+			LOG.error("Can not load auth properties from path: "+properties, e);
+		}
+	}
+	
+	public static void init(Map<String, String> config){
+		
+		PROJECT_CODE = Strings.isNullOrEmpty(config.get("work.project.code"))?PROJECT_CODE:config.get("work.project.code");
+		PROJECT_PASSWORD = Strings.isNullOrEmpty(config.get("work.project.password"))?PROJECT_CODE:config.get("work.project.password");
+		API_HOST = Strings.isNullOrEmpty(config.get("work.api"))?PROJECT_CODE:config.get("work.api");
+		SSO_DOMAIN = Strings.isNullOrEmpty(config.get("work.domain"))?PROJECT_CODE:config.get("work.domain");
+		
 	}
 	
 	/**
