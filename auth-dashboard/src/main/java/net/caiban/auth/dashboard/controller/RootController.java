@@ -66,10 +66,12 @@ public class RootController extends BaseController {
 	}
 	
 	@RequestMapping
-	public ModelAndView login(Map<String, Object> out, HttpServletRequest request, String go){
-		if(!Strings.isNullOrEmpty(go)){
-			out.put("gourl", bsService.queryUrl(go));
-		}
+	public ModelAndView login(Map<String, Object> out,
+			HttpServletRequest request, String go, String url) {
+//		if(!Strings.isNullOrEmpty(go)){
+//			out.put("gourl", bsService.queryUrl(go));
+//		}
+		out.put("url", url);
 		return null;
 	}
 	

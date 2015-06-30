@@ -106,7 +106,11 @@ public class AuthorizeFilter implements Filter {
 			return ;
 		}
 
-		response.sendRedirect(path+url);
+		if(url.startsWith("http://")||url.startsWith("https://")){
+			response.sendRedirect(url);
+		}else {
+			response.sendRedirect(path+url);
+		}
 		return ;
 	}
 
@@ -124,7 +128,7 @@ public class AuthorizeFilter implements Filter {
 		if(!Strings.isNullOrEmpty(e1)){
 			tmp=e1.split("\\|");
 			for(String ex:tmp){
-				noLoginPage.add(ex);
+				noLoginPage.add(ex.trim().replace("\\n", ""));
 			}
 		}
 
@@ -133,7 +137,7 @@ public class AuthorizeFilter implements Filter {
 		if(!Strings.isNullOrEmpty(e2)){
 			tmp=e2.split("\\|");
 			for(String ex:tmp){
-				noAuthPage.add(ex);
+				noAuthPage.add(ex.trim().replace("\\n", ""));
 			}
 		}
 	}
