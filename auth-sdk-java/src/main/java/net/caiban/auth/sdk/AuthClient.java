@@ -137,6 +137,11 @@ public class AuthClient {
 		
 		String resp = HttpRequestUtil.httpGet(AuthConst.API_HOST+"/ssoTicket.htm?t="+ticket+"&pc="+pcode);
 		
+		if(!JSONUtils.mayBeJSON(resp)){
+			LOG.debug("Auth API is not avalible. response is :"+resp);
+			throw new YYAuthException("NETWORK_ERROR");
+		}
+		
 		JSONObject respJson = JSONObject.fromObject(resp);
 		
 		SessionUser sessionUser = (SessionUser) JSONObject.toBean(respJson.getJSONObject("data"), SessionUser.class);

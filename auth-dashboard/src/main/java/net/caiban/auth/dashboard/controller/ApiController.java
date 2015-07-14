@@ -124,6 +124,7 @@ public class ApiController extends BaseController {
 				userStr = jedis.get(t);
 			} catch (Exception e) {
 				result.setData("SERVER_EXCEPTION");
+				JedisUtil.getPool().returnBrokenResource(jedis);
 				break;
 			}finally{
 				if(jedis!=null){
