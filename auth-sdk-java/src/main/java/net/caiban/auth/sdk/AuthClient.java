@@ -144,6 +144,10 @@ public class AuthClient {
 		
 		JSONObject respJson = JSONObject.fromObject(resp);
 		
+		if(!JSONUtils.mayBeJSON(respJson.optString("data"))){
+			throw new YYAuthException("INVALID_SESSION");
+		}
+		
 		SessionUser sessionUser = (SessionUser) JSONObject.toBean(respJson.getJSONObject("data"), SessionUser.class);
 		
 		if(sessionUser==null){
