@@ -91,7 +91,7 @@ public class ApiController extends BaseController {
 				break;
 			}finally{
 				if(jedis!=null){
-					JedisUtil.getPool().returnResource(jedis);
+					jedis.close();
 				}
 			}
 			result.setSuccess(true);
@@ -124,11 +124,10 @@ public class ApiController extends BaseController {
 				userStr = jedis.get(t);
 			} catch (Exception e) {
 				result.setData("SERVER_EXCEPTION");
-				JedisUtil.getPool().returnBrokenResource(jedis);
 				break;
 			}finally{
 				if(jedis!=null){
-					JedisUtil.getPool().returnResource(jedis);
+					jedis.close();
 				}
 			}
 			
@@ -182,6 +181,17 @@ public class ApiController extends BaseController {
 	@RequestMapping
 	public ModelAndView ssoLogout(HttpServletRequest request, Map<String, Object> out, String t){
 //		MemcachedUtils.getInstance().getClient().delete(t);
+		Jedis jedis = null;
+		try {
+			jedis = JedisUtil.getPool().getResource();
+			jedis.del(t);
+		} catch (Exception e) {
+		}finally{
+			if(jedis!=null){
+				jedis.close();
+			}
+		}
+		
 		return printJson("{result:true}", out);
 	}
 	
