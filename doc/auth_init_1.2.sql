@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `zzwork` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `zzwork`;
+CREATE DATABASE  IF NOT EXISTS `auth` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `auth`;
 -- MySQL dump 10.13  Distrib 5.5.37, for debian-linux-gnu (x86_64)
 --
 -- Host: 192.168.1.200    Database: zzwork
