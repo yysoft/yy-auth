@@ -375,7 +375,7 @@
 			<id>production</id>
 			<properties>
 				<package.environment>production</package.environment>
-				<jdbc.location>file:/usr/tools/config/db/db-zzwork.properties</jdbc.location>
+				<jdbc.location>file:/home/wcc/config/db-auth.properties</jdbc.location>
 			</properties>
 		</profile>
 		<profile>
