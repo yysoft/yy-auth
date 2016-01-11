@@ -62,30 +62,23 @@
 	</bean>
 
 	<!--  shared velocity engine which will be used by email and page presentation -->
-	<bean id="velocityEngine"
-		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
-		<property name="resourceLoaderPath" value="${velocity.resourceLoaderPath}"         />
-		<property name="preferFileSystemAccess" value="${velocity.preferFileSystemAccess}" />
+
+	<bean id="velocityConfigurer"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/views/" /> 
 		<property name="velocityProperties">
 			<props>
-				<prop key="input.encoding">${input.encoding}</prop>
-				<prop key="output.encoding">${output.encoding}</prop>
-				<prop key="file.resource.loader.cache">false</prop>
-				<prop key="file.resource.loader.modificationCheckInterval">2</prop>
+				<prop key="input.encoding">utf-8</prop>
+				<prop key="output.encoding">utf-8</prop>
 				<prop key="velocimacro.library">macro.vm</prop>
-				<!-- 针对开发而非实际应用的 -->
 				<prop key="velocimacro.library.autoreload">true</prop>
 			</props>
 		</property>
 	</bean>
-	<bean id="velocityConfig"
-		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
-		<property name="velocityEngine" ref="velocityEngine" />
-	</bean>
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
 		<property name="exposeSpringMacroHelpers" value="true" />
-		<property name="suffix" value="${velocity.suffix}" />
+		<property name="suffix" value=".vm" />
 		<property name="layoutUrl" value="layout/default.vm" />
 		<property name="contentType" value="text/html;charset=utf-8" />
 		<property name="toolboxConfigLocation" value="WEB-INF/vm-toolbox.xml" />
